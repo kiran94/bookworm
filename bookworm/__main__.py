@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    logger.info("Starting Bookworm")
+    logger.info("[bold green]Starting Bookworm 📖")
     logger.debug("Running on platform '%s'", sys.platform)
 
     argparser = argparse.ArgumentParser(description="Bookworm - A LLM-powered bookmark search engine")
@@ -36,7 +36,7 @@ def main():
         console = Console()
 
         for index, bookmark in enumerate(bookmarks.bookmarks):
-            console.print(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")  # {bookmark.url}")
+            logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")
 
         logger.info("Press a number to open the bookmark:")
         while True:

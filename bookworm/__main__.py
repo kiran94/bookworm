@@ -13,11 +13,11 @@ def main():
     logger.info("Starting Bookworm")
     logger.debug("Running on platform '%s'", sys.platform)
 
-    argparser = argparse.ArgumentParser(description="Bookworm - A bookmark manager")
+    argparser = argparse.ArgumentParser(description="Bookworm - A LLM-powered bookmark search engine")
 
     sub_parsers = argparser.add_subparsers(dest="command", help="Available commands")
     sub_parsers.add_parser("sync", help="Sync the bookmark database with the latest changes")
-    sub_parsers.add_parser("ask", help="Ask about a bookmark")
+    sub_parsers.add_parser("ask", help="Search for a bookmark")
 
     args = argparser.parse_args()
 

@@ -2,15 +2,8 @@ import sys
 import logging
 import argparse
 
-import duckdb
-from langchain_community.vectorstores import DuckDB as DuckDBVectorStore
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-
 from bookworm.commands.sync import sync
-from bookworm.storage import full_database_path, _get_embedding_store
-from bookworm.models import Bookmarks
+from bookworm.commands.ask import ask
 
 logger = logging.getLogger(__name__)
 
@@ -29,39 +22,18 @@ def main():
 
     logger.debug("Arguments: %s", args)
 
-    # sync = refresh the bookmark database with the latest changes
     if args.command == "sync":
         sync()
 
     elif args.command == "ask":
         query = input("What do you want to search for? ")
-        print(query)
+        logger.debug("query: %s", query)
 
-        system_message = """
-        You have knowledge about all the browser bookmarks stored by an individual.
-        When a user asks a question, you should be able to search the bookmarks and return the most relevant bookmark title and URL.
-        It could be multiple bookmarks.
+        bookmarks = ask(query)
 
-        The bookmarks available are from the context:
-        {context}
-        """
-
-        llm = ChatOpenAI(temperature=0.0)
-        llm = llm.with_structured_output(Bookmarks)
-
-        prompt = ChatPromptTemplate.from_messages([("system", system_message), ("human", "{query}")])
-
-        with duckdb.connect(full_database_path, read_only=False) as conn:
-            vector_store = DuckDBVectorStore(connection=conn, embedding=_get_embedding_store())
-            vector_store_rec = vector_store.as_retriever()
-
-            chain = {"context": vector_store_rec, "query": RunnablePassthrough()} | prompt | llm
-
-            response = chain.invoke(query)
-
-            for bookmark in response.bookmarks:
-                print(bookmark.title, " - ", bookmark.url)
-                print("**********")
+        for bookmark in bookmarks.bookmarks:
+            print(bookmark.title, " - ", bookmark.url)
+            print("**********")
 
 
 if __name__ == "__main__":

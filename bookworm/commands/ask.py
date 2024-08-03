@@ -1,8 +1,11 @@
+import os
+
 import duckdb
 from langchain_community.vectorstores import DuckDB as DuckDBVectorStore
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+from langchain_core.language_models.chat_models import BaseChatModel
 
 from bookworm.models import Bookmarks
 from bookworm.storage import full_database_path, _get_embedding_store
@@ -19,7 +22,7 @@ The bookmarks available are from the context:
 
 
 def ask(query: str) -> Bookmarks:
-    llm = ChatOpenAI(temperature=0.0)
+    llm = _get_llm()
     llm = llm.with_structured_output(Bookmarks)
 
     prompt = ChatPromptTemplate.from_messages([("system", _system_message), ("human", "{query}")])
@@ -33,3 +36,20 @@ def ask(query: str) -> Bookmarks:
         response = chain.invoke(query)
 
         return response
+
+
+def _get_llm() -> BaseChatModel:
+    kwargs = {
+        "temperature": 0.0,
+    }
+
+    if os.environ.get("OPENAI_API_KEY"):
+        # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.base.ChatOpenAI.html
+        return ChatOpenAI(**kwargs)
+
+    elif os.environ.get("AZURE_OPENAI_API_KEY"):
+        # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html
+        return AzureChatOpenAI(**kwargs)
+
+    else:
+        raise ValueError("No OpenAI API key found in environment variables")

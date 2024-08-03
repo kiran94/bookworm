@@ -7,29 +7,12 @@ from langchain_community.vectorstores import DuckDB as DuckDBVectorStore
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from langchain_core.pydantic_v1 import BaseModel, Field
 
 from bookworm.commands.sync import sync
 from bookworm.storage import full_database_path, _get_embedding_store
+from bookworm.models import Bookmarks
 
 logger = logging.getLogger(__name__)
-
-
-class Bookmark(BaseModel):
-    """
-    A bookmark to a website
-    """
-
-    title: str = Field(description="The title of the bookmark")
-    url: str = Field(description="The URL of the bookmark")
-
-
-class Bookmarks(BaseModel):
-    """
-    A list of bookmarks
-    """
-
-    bookmarks: list[Bookmark] = Field(description="A list of bookmarks")
 
 
 def main():

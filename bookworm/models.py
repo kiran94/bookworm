@@ -1,4 +1,10 @@
+import sys
+import subprocess
+import logging
+
 from langchain_core.pydantic_v1 import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 
 class Bookmark(BaseModel):
@@ -8,6 +14,17 @@ class Bookmark(BaseModel):
 
     title: str = Field(description="The title of the bookmark")
     url: str = Field(description="The URL of the bookmark")
+
+    def open(self):
+        if sys.platform == "win32":
+            subprocess.Popen(["start", self.url], shell=True)
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", self.url])
+        elif sys.platform == "linux":
+            subprocess.Popen(["xdg-open", self.url])
+        else:
+            logger.warning(f'Platform "{sys.platform}" not supported. Printing URL instead')
+            logger.info(self.url)
 
 
 class Bookmarks(BaseModel):

@@ -2,6 +2,7 @@ import sys
 import logging
 import argparse
 
+from rich.console import Console
 from bookworm.commands.sync import sync
 from bookworm.commands.ask import ask
 
@@ -31,9 +32,23 @@ def main():
 
         bookmarks = ask(query)
 
-        for bookmark in bookmarks.bookmarks:
-            print(bookmark.title, " - ", bookmark.url)
-            print("**********")
+        console = Console()
+
+        for index, bookmark in enumerate(bookmarks.bookmarks):
+            console.print(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")  # {bookmark.url}")
+
+        logger.info("Press a number to open the bookmark:")
+        while True:
+            try:
+                raw_input = input("> ")
+                selected_index = int(raw_input)
+                bookmarks.bookmarks[selected_index].open()
+
+                break
+            except ValueError:
+                logger.warning(f"Invalid input: '{raw_input}'. Please enter a number.")
+            except IndexError:
+                logger.warning(f"Invalid index: '{selected_index}'. Please select a valid index.")
 
 
 if __name__ == "__main__":

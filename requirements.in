@@ -1,0 +1,10 @@
+langchain
+langchain-community
+langchain-openai
+langchain-core<=0.2
+jupyterlab
+jq
+duckdb
+pandas
+rich
+platformdirs

@@ -24,6 +24,14 @@ class Bookmark(BaseModel):
     url: str = Field(description="The URL of the bookmark")
 
 
+class Bookmarks(BaseModel):
+    """
+    A list of bookmarks
+    """
+
+    bookmarks: list[Bookmark] = Field(description="A list of bookmarks")
+
+
 def main():
     logger.info("Starting Bookworm")
     logger.debug("Running on platform '%s'", sys.platform)
@@ -49,13 +57,14 @@ def main():
         system_message = """
         You have knowledge about all the browser bookmarks stored by an individual.
         When a user asks a question, you should be able to search the bookmarks and return the most relevant bookmark title and URL.
+        It could be multiple bookmarks.
 
         The bookmarks available are from the context:
         {context}
         """
 
         llm = ChatOpenAI(temperature=0.0)
-        llm = llm.with_structured_output(Bookmark)
+        llm = llm.with_structured_output(Bookmarks)
 
         prompt = ChatPromptTemplate.from_messages([("system", system_message), ("human", "{query}")])
 
@@ -67,8 +76,9 @@ def main():
 
             response = chain.invoke(query)
 
-            print(response)
-            print(type(response))
+            for bookmark in response.bookmarks:
+                print(bookmark.title, " - ", bookmark.url)
+                print("**********")
 
 
 if __name__ == "__main__":

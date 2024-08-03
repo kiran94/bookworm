@@ -11,7 +11,7 @@ _is_debug = logging.getLevelName(LOGGING_LEVEL) == logging.DEBUG
 logging.basicConfig(
     level=LOGGING_LEVEL,
     format=LOGGING_FORMAT,
-    handlers=[RichHandler(markup=True, show_path=_is_debug, show_time=_is_debug, show_level=True)],
+    handlers=[RichHandler(markup=True, show_path=_is_debug, show_time=_is_debug, show_level=_is_debug)],
 )
 
 logging.getLogger("httpx").setLevel(logging.WARNING)

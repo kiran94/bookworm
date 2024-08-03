@@ -27,9 +27,10 @@ def main():
         sync()
 
     elif args.command == "ask":
-        query = input("What do you want to search for? ")
-        logger.debug("query: %s", query)
+        logger.info("What would you like to search for?")
+        query = input("> ")
 
+        logger.debug("query: %s", query)
         bookmarks = ask(query)
 
         console = Console()

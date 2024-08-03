@@ -1,0 +1,17 @@
+import logging
+import os
+
+from rich.logging import RichHandler
+
+LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL", logging.INFO)
+LOGGING_FORMAT = os.environ.get("LOGGING_FORMAT", "%(message)s")
+
+_is_debug = logging.getLevelName(LOGGING_LEVEL) == logging.DEBUG
+
+logging.basicConfig(
+    level=LOGGING_LEVEL,
+    format=LOGGING_FORMAT,
+    handlers=[RichHandler(markup=True, show_path=_is_debug, show_time=_is_debug, show_level=True)],
+)
+
+logging.getLogger("httpx").setLevel(logging.WARNING)

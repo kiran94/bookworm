@@ -28,14 +28,32 @@ Brave -->|load bookmarks|Bookworm
 Bookworm -->|vectorize bookmarks|EmbeddingsService-->|store embeddings|VectorStore
 ```
 
-*`bookworm ask`*
+---
 
+*`bookworm ask`*
 
 ```python
 python -m bookworm ask
 ```
 
-TODO
+```mermaid
+graph LR
+
+query
+Bookworm(bookworm ask)
+
+subgraph _
+    LLM(LLM e.g OpenAI)
+    VectorStore(Vector Store e.g DuckDB)
+end
+
+query -->|user queries for information|Bookworm
+
+Bookworm -->|simularity search|VectorStore -->|send similar docs + user query|LLM
+LLM -->|send back response|Bookworm
+```
+
+---
 
 
 ### Developer Setup 

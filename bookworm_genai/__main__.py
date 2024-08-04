@@ -3,8 +3,8 @@ import logging
 import argparse
 
 from rich.console import Console
-from bookworm.commands.sync import sync
-from bookworm.commands.ask import ask
+from bookworm_genai.commands.sync import sync
+from bookworm_genai.commands.ask import ask
 
 logger = logging.getLogger(__name__)
 

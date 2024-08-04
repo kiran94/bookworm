@@ -1,2 +1,30 @@
+[tool.poetry]
+name = "bookworm_genai"
+version = "0.1.0"
+description = "Bookworm - A LLM-powered bookmark search engine"
+authors = ["kiran94"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+langchain = "^0.2.12"
+langchain-community = "^0.2.11"
+langchain-openai = "^0.1.20"
+jq = "^1.7.0"
+duckdb = "^1.0.0"
+rich = "^13.7.1"
+platformdirs = "^4.2.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+ruff = "^0.5.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+bookworm = 'bookworm_genai.__main__:main'
+
 [tool.ruff]
 line-length = 160

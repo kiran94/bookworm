@@ -4,8 +4,8 @@ import logging
 
 from langchain_community.document_loaders import JSONLoader
 
-from bookworm.integrations import browsers
-from bookworm.storage import store_documents
+from bookworm_genai.integrations import browsers
+from bookworm_genai.storage import store_documents
 
 logger = logging.getLogger(__name__)
 

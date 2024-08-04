@@ -7,8 +7,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from bookworm.models import Bookmarks
-from bookworm.storage import full_database_path, _get_embedding_store
+from bookworm_genai.models import Bookmarks
+from bookworm_genai.storage import full_database_path, _get_embedding_store
 
 
 _system_message = """

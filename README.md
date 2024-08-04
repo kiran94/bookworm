@@ -70,3 +70,18 @@ export LANGCHAIN_PROJECT=bookworm
 # Misc (optional)
 export LOGGING_LEVEL=INFO
 ```
+
+Recommendations:
+
+- Install [`pyenv`](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation) and ensure [build dependencies are installed](https://github.com/pyenv/pyenv?tab=readme-ov-file#install-python-build-dependencies) for your OS.
+- Install [Poetry](https://python-poetry.org/docs/) we will be using [environment management](https://python-poetry.org/docs/managing-environments/) below.
+
+
+```bash
+poetry env use 3.9 # or path to your 3.9 installation
+
+poetry shell
+poetry install
+
+bookworm --help
+```

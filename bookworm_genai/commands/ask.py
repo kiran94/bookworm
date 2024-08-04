@@ -1,4 +1,5 @@
 import os
+import logging
 
 import duckdb
 from langchain_community.vectorstores import DuckDB as DuckDBVectorStore
@@ -9,6 +10,8 @@ from langchain_core.language_models.chat_models import BaseChatModel
 
 from bookworm_genai.models import Bookmarks
 from bookworm_genai.storage import full_database_path, _get_embedding_store
+
+logger = logging.getLogger(__name__)
 
 
 _system_message = """
@@ -21,21 +24,30 @@ The bookmarks available are from the context:
 """
 
 
-def ask(query: str) -> Bookmarks:
-    llm = _get_llm()
-    llm = llm.with_structured_output(Bookmarks)
+class BookmarkChain:
+    def __init__(self):
+        self._duckdb_connection = duckdb.connect(full_database_path, read_only=False)
+        self.vector_store = DuckDBVectorStore(connection=self._duckdb_connection, embedding=_get_embedding_store())
 
-    prompt = ChatPromptTemplate.from_messages([("system", _system_message), ("human", "{query}")])
+        llm = _get_llm()
+        llm = llm.with_structured_output(Bookmarks)
 
-    with duckdb.connect(full_database_path, read_only=False) as conn:
-        vector_store = DuckDBVectorStore(connection=conn, embedding=_get_embedding_store())
-        vector_store_rec = vector_store.as_retriever()
+        prompt = ChatPromptTemplate.from_messages([("system", _system_message), ("human", "{query}")])
 
-        chain = {"context": vector_store_rec, "query": RunnablePassthrough()} | prompt | llm
+        self.chain = {"context": self.vector_store.as_retriever(), "query": RunnablePassthrough()} | prompt | llm
 
-        response = chain.invoke(query)
+    def ask(self, query: str) -> Bookmarks:
+        logger.debug("Searching for bookmarks with query: %s", query)
 
-        return response
+        return self.chain.invoke(query)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        logger.debug("Closing DuckDB connection")
+
+        self._duckdb_connection.close()
 
 
 def _get_llm() -> BaseChatModel:

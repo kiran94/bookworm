@@ -2,9 +2,8 @@ import sys
 import logging
 import argparse
 
-from rich.console import Console
 from bookworm_genai.commands.sync import sync
-from bookworm_genai.commands.ask import ask
+from bookworm_genai.commands.ask import BookmarkChain
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +30,9 @@ def main():
         query = input("> ")
 
         logger.debug("query: %s", query)
-        bookmarks = ask(query)
 
-        console = Console()
+        with BookmarkChain() as bookmark_chain:
+            bookmarks = bookmark_chain.ask(query)
 
         for index, bookmark in enumerate(bookmarks.bookmarks):
             logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")

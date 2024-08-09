@@ -43,6 +43,23 @@ class BookmarkChain:
 
         return self.chain.invoke(query)
 
+    def is_valid(self) -> bool:
+        res = self._duckdb_connection.execute("SELECT COUNT(*) FROM embeddings").fetchall()
+
+        try:
+            res = res[0][0]
+        except IndexError:
+            logger.warning("validation check failed due to unexpected response from the database.")
+            logger.debug("Raw DuckDB Response: %s", res)
+
+            return False
+
+        if res == 0:
+            logger.warning("No bookmarks were found in database. Please ensure you run 'bookworm sync' before asking questions")
+            return False
+        else:
+            return True
+
     def __enter__(self):
         return self
 

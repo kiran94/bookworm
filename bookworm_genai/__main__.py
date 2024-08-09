@@ -32,6 +32,10 @@ def main():
         logger.debug("query: %s", query)
 
         with BookmarkChain() as bookmark_chain:
+            if not bookmark_chain.is_valid():
+                logger.debug("bookmark chain is not valid, exiting early.")
+                return
+
             bookmarks = bookmark_chain.ask(query)
 
         if not bookmarks.bookmarks:

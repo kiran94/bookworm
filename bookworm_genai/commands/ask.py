@@ -27,6 +27,7 @@ The bookmarks available are from the context:
 
 class BookmarkChain:
     def __init__(self):
+        logger.debug("Connecting to vector database at: %s", full_database_path)
         self._duckdb_connection = duckdb.connect(full_database_path, read_only=False)
         self.vector_store = DuckDBVectorStore(connection=self._duckdb_connection, embedding=_get_embedding_store())
 

@@ -46,7 +46,11 @@ def main():
             return
 
         for index, bookmark in enumerate(bookmarks.bookmarks):
-            logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")
+            if logger.isEnabledFor(logging.DEBUG):
+                # also shows the source of the bookmark
+                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ({bookmark.source})")
+            else:
+                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")
 
         logger.info("Press a number to open the bookmark:")
         while True:

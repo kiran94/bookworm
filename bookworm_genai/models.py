@@ -14,6 +14,7 @@ class Bookmark(BaseModel):
 
     title: str = Field(description="The title of the bookmark")
     url: str = Field(description="The URL of the bookmark")
+    source: str = Field(description="The source of the bookmark")
 
     def open(self):
         if sys.platform == "win32":

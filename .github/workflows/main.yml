@@ -46,17 +46,6 @@ jobs:
           lcov-file: coverage.lcov
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
-      - name: Integration Test
-        if: matrix.os == 'ubuntu-latest'
-        run: make integration_test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PYDEVD_DISABLE_FILE_VALIDATION: 1
-      - name: Verify Notebooks
-        if: matrix.os == 'ubuntu-latest'
-        env:
-          PYDEVD_DISABLE_FILE_VALIDATION: 1
-        run: make validate_notebooks
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 10

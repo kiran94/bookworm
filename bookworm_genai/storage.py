@@ -9,7 +9,7 @@ from langchain_core.embeddings.embeddings import Embeddings
 from langchain_openai.embeddings import OpenAIEmbeddings, AzureOpenAIEmbeddings
 
 appdirs = PlatformDirs("bookworm", "bookworm")
-database_name = "bookmark.duckdb"
+database_name = "bookmarks.duckdb"
 full_database_path = os.path.join(appdirs.user_data_dir, database_name)
 
 logger = logging.getLogger(__name__)

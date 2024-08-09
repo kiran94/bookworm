@@ -34,6 +34,13 @@ def main():
         with BookmarkChain() as bookmark_chain:
             bookmarks = bookmark_chain.ask(query)
 
+        if not bookmarks.bookmarks:
+            logger.info("""
+            No bookmarks found for the query 🙁. Please ensure you have performed a "bookworm sync" to update the database
+            and the query is relevant to the bookmarks stored.
+            """)
+            return
+
         for index, bookmark in enumerate(bookmarks.bookmarks):
             logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")
 

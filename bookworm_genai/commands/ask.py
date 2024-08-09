@@ -18,6 +18,7 @@ _system_message = """
 You have knowledge about all the browser bookmarks stored by an individual.
 When a user asks a question, you should be able to search the bookmarks and return the most relevant bookmark title and URL.
 It could be multiple bookmarks.
+If you don't have anything in the context then return empty list
 
 The bookmarks available are from the context:
 {context}

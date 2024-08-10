@@ -107,23 +107,20 @@ jobs:
 
             https://pypi.org/project/bookworm_genai/${{steps.prerelease.outputs.VERSION}}/
           comment_tag: execution
-
-# Main Release
-# - name: Bump Poetry
-#   if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
-#   run: poetry version ${{ steps.release.outputs.version }}
-#
-# - name: Deploy
-#   if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
-#   run: |
-#     poetry build
-#     poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
-#   env:
-#     POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
-
-# - uses: EndBug/add-and-commit@v9
-#   if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
-#   with:
-#     message: "chore(version): bump"
-#     default_author: github_actions
-#     add: pyproject.toml
+      # Main Release
+      - name: Bump Poetry
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        run: poetry version ${{ steps.release.outputs.version }}
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        run: |
+          poetry build
+          poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+      - uses: EndBug/add-and-commit@v9
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        with:
+          message: "chore(version): bump"
+          default_author: github_actions
+          add: pyproject.toml

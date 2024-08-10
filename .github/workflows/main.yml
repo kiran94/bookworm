@@ -1,0 +1,126 @@
+name: main
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.x']
+        poetry-version: ['1.4.2']
+        os: [ubuntu-latest] # , windows-latest]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Poetry Check
+        run: poetry check
+      - name: Install Dependencies
+        run: |
+          poetry build
+          poetry install
+      - name: Lint
+        run: make lint
+      - name: Test
+        run: make test
+      - name: Code Coverage
+        if: matrix.python-version == '3.x' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
+        run: make coverage
+      - name: Code Coverage Report
+        if: matrix.python-version == '3.x' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
+        uses: romeovs/lcov-reporter-action@2a28ec3e25fb7eae9cb537e9141603486f810d1a # https://github.com/romeovs/lcov-reporter-action/issues/46
+        with:
+          lcov-file: coverage.lcov
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build]
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: abatilo/actions-poetry@v2
+      - name: Release
+        id: release
+        uses: go-semantic-release/action@v1
+        if: github.ref == 'refs/heads/main'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          allow-initial-development-versions: true
+      # Prerelease
+      - name: Bump Poetry (Prerelease)
+        id: prerelease
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
+        run: |
+          python -m pip install semantic-version
+
+          # extract the current version
+          VERSION=$(cat pyproject.toml | grep "^version =" | cut -d= -f2 | sed 's/"//g' | sed 's/^\s*\|\s*$//g')
+
+          # bump the version
+          # it's difficult to know if this should be patch, minor, major ahead of time as it would require running the actual release action
+          VERSION=$(python -c "from semantic_version import Version; v = Version('${VERSION}'); v = v.next_patch(); print(v)")
+
+          # add prerelease version identifier
+          VERSION="${VERSION}b${{ github.run_number }}" # _${{ github.run_attempt }}"
+
+          poetry version $VERSION
+
+          # ensure the published package links back to the pull request
+          PULL_REQUEST_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          sed "s/repository =.*/repository = \"https:\/\/github.com\/kiran94\/bookworm\/pull\/$PULL_REQUEST_NUMBER\"/" pyproject.toml -i
+
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+      - name: Deploy (Prerelease)
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
+        run: |
+          poetry build
+          poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+      - name: Comment (Prerelease)
+        if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Change was prereleased to pypi. Try it out :rocket:
+
+            ```bash
+            python -m pip install bookworm_genai==${{steps.prerelease.outputs.VERSION}}
+            ```
+
+            https://pypi.org/project/bookworm_genai/${{steps.prerelease.outputs.VERSION}}/
+          comment_tag: execution
+      # Main Release
+      - name: Bump Poetry
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        run: poetry version ${{ steps.release.outputs.version }}
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        run: |
+          poetry build
+          poetry publish -u __token__ -p $POETRY_PYPI_TOKEN_PYPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+      - uses: EndBug/add-and-commit@v9
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.version != ''
+        with:
+          message: "chore(version): bump"
+          default_author: github_actions
+          add: pyproject.toml

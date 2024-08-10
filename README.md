@@ -1,5 +1,7 @@
 # bookworm
 
+[![main](https://github.com/kiran94/bookworm/actions/workflows/main.yml/badge.svg)](https://github.com/kiran94/bookworm/actions/workflows/main.yml)
+
 ### Processes 
 
 *`bookworm sync`*

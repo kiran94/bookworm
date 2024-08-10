@@ -4,6 +4,16 @@ version = "0.1.0"
 description = "Bookworm - A LLM-powered bookmark search engine"
 authors = ["kiran94"]
 readme = "README.md"
+license = "MIT"
+homepage = "https://pypi.org/project/bookworm_genai/"
+repository = "https://github.com/kiran94/bookworm"
+documentation = "https://github.com/kiran94/bookworm/blob/main/README.md"
+keywords = [ "bookmarks", "bookmark-manager", "genai", "chatbots" ]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"

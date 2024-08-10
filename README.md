@@ -1,8 +1,38 @@
-# bookworm
+# bookworm 📖
 
-[![main](https://github.com/kiran94/bookworm/actions/workflows/main.yml/badge.svg)](https://github.com/kiran94/bookworm/actions/workflows/main.yml)
+[![main](https://github.com/kiran94/bookworm/actions/workflows/main.yml/badge.svg)](https://github.com/kiran94/bookworm/actions/workflows/main.yml) [![PyPI version](https://badge.fury.io/py/bookworm_genai.svg)](https://badge.fury.io/py/bookworm_genai)
 
-### Processes 
+> LLM-powered bookmark search engine
+
+`bookworm` allows you to search your locally stored bookmarks using human language.
+
+## Install
+
+```bash
+python -m pip install bookworm_genai
+```
+
+## Usage
+
+```bash
+export OPENAI_API_KEY=
+
+# Run once and then anytime bookmarks across supported browsers changes
+bookworm sync
+
+# Ask questions against the bookmark database
+bookworm ask
+```
+
+The `sync` process currently supports the following configurations:
+
+| Operating System | Google Chrome | Mozilla Firefox | Brave | Microsoft Edge |
+| ------------------ | --------------- | ----------------- | ------- | ---------------- |
+| **Linux**          | ✅              | ❌                | ✅      | ❌               |
+| **macOS**          | ❌              | ❌                | ❌      | ❌               |
+| **Windows**        | ❌              | ❌                | ❌      | ❌               |
+
+## Processes
 
 *`bookworm sync`*
 
@@ -13,7 +43,7 @@ python -m bookworm sync
 ```mermaid
 graph LR
 
-subgraph Bookmarks 
+subgraph Bookmarks
     Chrome(Chrome Bookmarks)
     Brave(Brave Bookmarks)
 end
@@ -57,8 +87,7 @@ LLM -->|send back response|Bookworm
 
 ---
 
-
-### Developer Setup 
+## Developer Setup
 
 ```bash
 # LLMs

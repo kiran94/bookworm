@@ -1,8 +1,6 @@
-import os
 import sys
 import logging
 
-from langchain_community.document_loaders import JSONLoader
 
 from bookworm_genai.integrations import browsers
 from bookworm_genai.storage import store_documents
@@ -20,19 +18,11 @@ def sync():
             logger.warning(f"Platform {sys.platform} not supported for browser {browser}")
             continue
         else:
-            expanded_path = os.path.expanduser(platform_config["bookmark_file_path"])
+            path = platform_config["bookmark_loader_kwargs"]["file_path"]
+            logger.info("Loading bookmarks from %s", path)
 
-            jq_command = """
-              [.roots.bookmark_bar.children, .roots.other.children] |
-              flatten |
-              .. |
-              objects |
-              select(.type == "url")
-            """
-
-            logger.info("Loading bookmarks from %s", expanded_path)
-            bookmark_bar = JSONLoader(expanded_path, jq_command, text_content=False)
-            docs.extend(bookmark_bar.lazy_load())
+            loader = platform_config["bookmark_loader"](**platform_config["bookmark_loader_kwargs"])
+            docs.extend(loader.lazy_load())
 
     logger.debug(f"{len(docs)} Bookmarks loaded")
 

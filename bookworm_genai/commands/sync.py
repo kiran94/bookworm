@@ -2,13 +2,12 @@ import sys
 import logging
 
 
-from bookworm_genai.integrations import browsers
 from bookworm_genai.storage import store_documents
 
 logger = logging.getLogger(__name__)
 
 
-def sync():
+def sync(browsers: dict):
     docs = []
 
     for browser, config in browsers.items():
@@ -22,6 +21,7 @@ def sync():
             logger.info("Loading bookmarks from %s", path)
 
             loader = platform_config["bookmark_loader"](**platform_config["bookmark_loader_kwargs"])
+
             docs.extend(loader.lazy_load())
 
     logger.debug(f"{len(docs)} Bookmarks loaded")

@@ -55,3 +55,21 @@ def test_sync(mock_sys: Mock, mock_store_documents: Mock):
     ]
 
     assert mock_store_documents.call_args_list == [call(["DOC1", "DOC2", "DOC1", "DOC2"])]
+
+
+@patch("bookworm_genai.commands.sync.store_documents")
+@patch.dict(browsers, _mock_browsers_config(), clear=True)
+@patch("bookworm_genai.commands.sync.sys")
+def test_sync_platform_unsupported(mock_sys: Mock, mock_store_documents: Mock, caplog):
+    platform = "unsupported"
+
+    mock_sys.platform = platform
+
+    browsers = _mock_browsers_config()
+    sync(browsers)
+
+    assert not mock_store_documents.called
+
+    logs = [log.message for log in caplog.records if log.levelname == "WARNING"]
+    logs.sort()
+    assert logs == ["Platform unsupported not supported for browser brave", "Platform unsupported not supported for browser chrome"]

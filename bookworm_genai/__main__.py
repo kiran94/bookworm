@@ -2,6 +2,7 @@ import sys
 import logging
 import argparse
 
+from bookworm_genai.integrations import browsers
 from bookworm_genai.commands.sync import sync
 from bookworm_genai.commands.ask import BookmarkChain
 
@@ -23,7 +24,7 @@ def main():
     logger.debug("Arguments: %s", args)
 
     if args.command == "sync":
-        sync()
+        sync(browsers)
 
     elif args.command == "ask":
         logger.info("What would you like to search for?")

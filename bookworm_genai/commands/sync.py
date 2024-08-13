@@ -26,4 +26,5 @@ def sync(browsers: dict):
 
     logger.debug(f"{len(docs)} Bookmarks loaded")
 
-    store_documents(docs)
+    if docs:
+        store_documents(docs)

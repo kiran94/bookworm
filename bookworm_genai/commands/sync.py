@@ -14,7 +14,7 @@ def sync(browsers: dict):
         try:
             platform_config = config[sys.platform]
         except KeyError:
-            logger.warning(f"Platform {sys.platform} not supported for browser {browser}")
+            logger.warning(f"Platform {sys.platform} not supported for browser {browser.value}")
             continue
         else:
             path = platform_config["bookmark_loader_kwargs"]["file_path"]

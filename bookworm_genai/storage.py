@@ -8,16 +8,11 @@ from langchain_core.documents import Document
 from langchain_core.embeddings.embeddings import Embeddings
 from langchain_openai.embeddings import OpenAIEmbeddings, AzureOpenAIEmbeddings
 
-appdirs = PlatformDirs("bookworm", "bookworm")
-database_name = "bookmarks.duckdb"
-full_database_path = os.path.join(appdirs.user_data_dir, database_name)
-
 logger = logging.getLogger(__name__)
 
 
 def store_documents(docs: list[Document]):
-    logger.debug(f"creating folder {appdirs.user_data_dir}")
-    os.makedirs(appdirs.user_data_dir, exist_ok=True)
+    full_database_path = _get_local_store()
 
     embeddings = _get_embedding_store()
 
@@ -28,6 +23,17 @@ def store_documents(docs: list[Document]):
 
         logger.debug("loading documents")
         DuckDBVectorStore.from_documents(docs, embeddings, connection=conn)
+
+
+def _get_local_store() -> str:
+    appdirs = PlatformDirs("bookworm", "bookworm")
+    database_name = "bookmarks.duckdb"
+    full_database_path = os.path.join(appdirs.user_data_dir, database_name)
+
+    logger.debug(f"creating folder {appdirs.user_data_dir}")
+    os.makedirs(appdirs.user_data_dir, exist_ok=True)
+
+    return full_database_path
 
 
 def _get_embedding_store() -> Embeddings:

@@ -37,13 +37,17 @@ def _get_local_store() -> str:
 
 
 def _get_embedding_store() -> Embeddings:
-    if os.environ.get("AZURE_OPENAI_API_KEY"):
+    if os.environ.get("AZURE_OPENAI_API_KEY", None):
         logger.debug("Using Azure OpenAI Embeddings")
         return AzureOpenAIEmbeddings()
 
-    elif os.environ.get("OPENAI_API_KEY"):
+    elif os.environ.get("OPENAI_API_KEY", None):
         logger.debug("Using OpenAI Embeddings")
         return OpenAIEmbeddings()
 
     else:
-        raise ValueError("No OpenAI API key found in environment variables")
+        raise ValueError('''
+            Embeddings service could not be configured. Ensure you have OPENAI_API_KEY or AZURE_OPENAI_API_KEY.
+            For Azure you will need extra env vars set:
+            https://api.python.langchain.com/en/latest/embeddings/langchain_openai.embeddings.azure.AzureOpenAIEmbeddings.html
+        ''')

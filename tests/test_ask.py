@@ -1,7 +1,10 @@
 import os
 from unittest.mock import patch, Mock
 
-from bookworm_genai.commands.ask import BookmarkChain, _system_message
+import pytest
+from langchain_openai import AzureChatOpenAI
+
+from bookworm_genai.commands.ask import BookmarkChain, _system_message, _get_llm
 from bookworm_genai.models import Bookmarks
 
 
@@ -73,6 +76,70 @@ def test_bookmark_chain_is_valid(
     mock_duckdb_connection.execute.return_value.fetchall.return_value = [(1,)]
 
     with BookmarkChain() as bc:
-        assert bc.is_valid() == True
+        assert bc.is_valid()
 
     mock_duckdb_connection.execute.assert_called_once_with("SELECT COUNT(*) FROM embeddings")
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("bookworm_genai.commands.ask.ChatPromptTemplate")
+@patch("bookworm_genai.commands.ask.ChatOpenAI")
+@patch("bookworm_genai.commands.ask.DuckDBVectorStore")
+@patch("bookworm_genai.commands.ask.duckdb")
+@patch("bookworm_genai.commands.ask._get_embedding_store")
+@patch("bookworm_genai.commands.ask._get_local_store")
+def test_bookmark_chain_is_valid_zero_count(
+    mock_local_store: Mock,
+    mock_embedding_store: Mock,
+    mock_duckdb: Mock,
+    mock_duckdb_vector: Mock,
+    mock_chatopenai: Mock,
+    mock_chat_prompt_template: Mock,
+):
+    mock_duckdb_connection = Mock()
+    mock_duckdb.connect.return_value = mock_duckdb_connection
+
+    mock_duckdb_connection.execute.return_value.fetchall.return_value = [(0,)]
+
+    with BookmarkChain() as bc:
+        assert not bc.is_valid()
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("bookworm_genai.commands.ask.ChatPromptTemplate")
+@patch("bookworm_genai.commands.ask.ChatOpenAI")
+@patch("bookworm_genai.commands.ask.DuckDBVectorStore")
+@patch("bookworm_genai.commands.ask.duckdb")
+@patch("bookworm_genai.commands.ask._get_embedding_store")
+@patch("bookworm_genai.commands.ask._get_local_store")
+@pytest.mark.parametrize(
+    "duckdb_response",
+    [[], None],
+)
+def test_bookmark_chain_is_valid_invalid_response(
+    mock_local_store: Mock,
+    mock_embedding_store: Mock,
+    mock_duckdb: Mock,
+    mock_duckdb_vector: Mock,
+    mock_chatopenai: Mock,
+    mock_chat_prompt_template: Mock,
+    duckdb_response,
+):
+    mock_duckdb_connection = Mock()
+    mock_duckdb.connect.return_value = mock_duckdb_connection
+
+    mock_duckdb_connection.execute.return_value.fetchall.return_value = duckdb_response
+
+    with BookmarkChain() as bc:
+        assert not bc.is_valid()
+
+
+@patch.dict(os.environ, {"AZURE_OPENAI_API_KEY": "secret", "OPENAI_API_VERSION": "version", "AZURE_OPENAI_ENDPOINT": "endpoint"}, clear=True)
+def test_get_llm_azure():
+    assert isinstance(_get_llm(), AzureChatOpenAI)
+
+
+@patch.dict(os.environ, {}, clear=True)
+def test_get_llm_no_env():
+    with pytest.raises(ValueError, match="LLM service could not be configured"):
+        _get_llm()

@@ -49,8 +49,9 @@ class BookmarkChain:
 
         try:
             res = res[0][0]
-        except IndexError:
+        except (IndexError, TypeError) as e:
             logger.warning("validation check failed due to unexpected response from the database.")
+            logger.debug("Error: %s", e)
             logger.debug("Raw DuckDB Response: %s", res)
 
             return False
@@ -75,13 +76,18 @@ def _get_llm() -> BaseChatModel:
         "temperature": 0.0,
     }
 
-    if os.environ.get("OPENAI_API_KEY"):
-        # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.base.ChatOpenAI.html
-        return ChatOpenAI(**kwargs)
-
-    elif os.environ.get("AZURE_OPENAI_API_KEY"):
+    if os.environ.get("AZURE_OPENAI_API_KEY"):
         # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html
         return AzureChatOpenAI(**kwargs)
 
+    elif os.environ.get("OPENAI_API_KEY"):
+        # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.base.ChatOpenAI.html
+        return ChatOpenAI(**kwargs)
+
     else:
-        raise ValueError("No OpenAI API key found in environment variables")
+        raise ValueError("""
+            LLM service could not be configured. Ensure you have OPENAI_API_KEY or AZURE_OPENAI_API_KEY.
+
+            If you are using OpenAI then please ensure you have the OPENAI_API_KEY environment variable set.
+            If you are using Azure OpenAI then please ensure you have the AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT + OPENAI_API_VERSION environment variables set.
+        """)

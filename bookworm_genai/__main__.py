@@ -15,11 +15,11 @@ def main():
 
     argparser = argparse.ArgumentParser(description="Bookworm - A LLM-powered bookmark search engine")
 
-    sub_parsers = argparser.add_subparsers(dest="command", help="Available commands")
+    sub_parsers = argparser.add_subparsers(dest="command", help="Available commands", required=True)
     sub_parsers.add_parser("sync", help="Sync the bookmark database with the latest changes")
     sub_parsers.add_parser("ask", help="Search for a bookmark")
 
-    args = argparser.parse_args()
+    args = argparser.parse_args(sys.argv[1:])
 
     logger.debug("Arguments: %s", args)
 
@@ -33,6 +33,7 @@ def main():
         logger.debug("query: %s", query)
 
         with BookmarkChain() as bookmark_chain:
+
             if not bookmark_chain.is_valid():
                 logger.debug("bookmark chain is not valid, exiting early.")
                 return

@@ -24,15 +24,17 @@ def _mock_browsers_config(platform: str = "linux"):
 
 
 @patch.dict(browsers, _mock_browsers_config(), clear=True)
+@patch("bookworm_genai.commands.sync.glob")
 @patch("bookworm_genai.commands.sync.shutil")
 @patch("bookworm_genai.commands.sync.os.makedirs")
 @patch("bookworm_genai.commands.sync.store_documents")
 @patch("bookworm_genai.commands.sync.sys")
-def test_sync(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, mock_shutil: Mock):
+def test_sync(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, mock_shutil: Mock, mock_glob: Mock):
     platform = "linux"
 
     mock_sys.platform = platform
     user = getuser()
+    mock_glob.glob.return_value = ["/mocked/firefox.sqlite"]
 
     browsers = _mock_browsers_config()
     sync(browsers)
@@ -73,7 +75,7 @@ def test_sync(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, m
 
     assert mock_store_documents.call_args_list == [call(["DOC1", "DOC2", "DOC1", "DOC2", "DOC1", "DOC2"])]
     assert mock_makedirs.call_args_list == [call("/tmp/bookworm", exist_ok=True)]
-    assert mock_shutil.copy.call_args_list == [call(ANY, "/tmp/bookworm/firefox.sqlite")]
+    assert mock_shutil.copy.call_args_list == [call(mock_glob.glob.return_value[0], "/tmp/bookworm/firefox.sqlite")]
 
 
 @patch("bookworm_genai.commands.sync.store_documents")

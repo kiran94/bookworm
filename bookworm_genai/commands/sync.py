@@ -44,11 +44,10 @@ def sync(browsers: dict):
 def _copy(config: dict):
     logger.debug(f"Copying {config['from']} to {config['to']}")
 
-    directory = os.path.dirname(config["to"])
-
     source = glob.glob(config["from"])
     source = source[0]
 
+    directory = os.path.dirname(config["to"])
     os.makedirs(directory, exist_ok=True)
 
     shutil.copy(source, config["to"])

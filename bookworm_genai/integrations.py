@@ -1,11 +1,14 @@
 import os
 from enum import Enum
 from langchain_community.document_loaders import JSONLoader
+from langchain_community.document_loaders.sql_database import SQLDatabaseLoader
+from langchain_community.utilities.sql_database import SQLDatabase
 
 
 class Browser(str, Enum):
     BRAVE = "brave"
     CHROME = "chrome"
+    FIREFOX = "firefox"
 
 
 _CHROMIUM_JQ_COMMAND = """
@@ -42,6 +45,40 @@ browsers = {
                 "file_path": os.path.expanduser("~/.config/google-chrome/Default/Bookmarks"),
                 "jq_schema": _CHROMIUM_JQ_COMMAND,
                 "text_content": False,
+            },
+        },
+        "win32": {},
+        "darwin": {},
+    },
+    Browser.FIREFOX: {
+        "linux": {
+            "bookmark_loader": SQLDatabaseLoader,
+            "bookmark_loader_kwargs": {
+                "db": lambda _: SQLDatabase.from_uri("sqlite:////tmp/bookworm/firefox.sqlite"),
+                "query": """
+                    SELECT
+                       CAST(moz_places.id AS TEXT) AS id,
+                       moz_bookmarks.title,
+                       moz_places.url,
+                       CAST(moz_bookmarks.dateAdded AS TEXT) AS dateAdded,
+                       CAST(moz_bookmarks.lastModified AS TEXT) AS lastModified
+                    FROM
+                       moz_bookmarks
+                    LEFT JOIN
+                       moz_places
+                    ON
+                       moz_bookmarks.fk = moz_places.id
+                    WHERE
+                       moz_bookmarks.type = 1
+                    AND
+                       moz_bookmarks.title IS NOT NULL
+                """,
+                "source_columns": ["id", "dateAdded", "lastModified"],
+                "page_content_mapper": lambda row: row["title"] + row["url"],
+            },
+            "copy": {
+                "from": os.path.expanduser("~/.mozilla/firefox/*.default-release/places.sqlite"),
+                "to": "/tmp/bookworm/firefox.sqlite",
             },
         },
         "win32": {},

@@ -54,9 +54,7 @@ def _copy(config: dict):
 
 
 def _log_bookmark_source(browser: Browser, platform_config: dict):
-    if not logger.isEnabledFor(logging.DEBUG):
-        logger.info("Loading bookmarks from %s", browser.value.title())
-        return
+    logger.info("Loading bookmarks from %s", browser.value.title())
 
     path = ""
 
@@ -75,4 +73,4 @@ def _log_bookmark_source(browser: Browser, platform_config: dict):
     except KeyError:
         pass
 
-    logger.info("Loading bookmarks from %s", path)
+    logger.debug("Loading bookmarks from %s", path)

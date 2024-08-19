@@ -33,7 +33,6 @@ def main():
         logger.debug("query: %s", query)
 
         with BookmarkChain() as bookmark_chain:
-
             if not bookmark_chain.is_valid():
                 logger.debug("bookmark chain is not valid, exiting early.")
                 return
@@ -50,7 +49,7 @@ def main():
         for index, bookmark in enumerate(bookmarks.bookmarks):
             if logger.isEnabledFor(logging.DEBUG):
                 # also shows the source of the bookmark
-                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ({bookmark.source})") # pragma: no cover
+                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ({bookmark.source})")  # pragma: no cover
             else:
                 logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")
 
@@ -69,4 +68,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() # pragma: no cover
+    main()  # pragma: no cover

@@ -26,9 +26,9 @@ bookworm ask
 
 The `sync` process currently supports the following configurations:
 
-| Operating System | Google Chrome | Mozilla Firefox | Brave | Microsoft Edge |
+| Operating System   | Google Chrome   | Mozilla Firefox   | Brave   | Microsoft Edge   |
 | ------------------ | --------------- | ----------------- | ------- | ---------------- |
-| **Linux**          | ✅              | ❌                | ✅      | ❌               |
+| **Linux**          | ✅              | ✅                | ✅      | ❌               |
 | **macOS**          | ❌              | ❌                | ❌      | ❌               |
 | **Windows**        | ❌              | ❌                | ❌      | ❌               |
 
@@ -46,6 +46,7 @@ graph LR
 subgraph Bookmarks
     Chrome(Chrome Bookmarks)
     Brave(Brave Bookmarks)
+    Firefox(Firefox Bookmarks)
 end
 
 Bookworm(bookworm sync)
@@ -56,6 +57,7 @@ VectorStore(Vector Store e.g DuckDB)
 
 Chrome -->|load bookmarks|Bookworm
 Brave -->|load bookmarks|Bookworm
+Firefox -->|load bookmarks|Bookworm
 
 Bookworm -->|vectorize bookmarks|EmbeddingsService-->|store embeddings|VectorStore
 ```

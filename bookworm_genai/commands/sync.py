@@ -4,15 +4,18 @@ import glob
 import logging
 import shutil
 
-from bookworm_genai.storage import store_documents
+import tiktoken
+from langchain_core.documents import Document
+
 from bookworm_genai.integrations import Browser
+from bookworm_genai.storage import store_documents, _get_embedding_store
 
 
 logger = logging.getLogger(__name__)
 
 
-def sync(browsers: dict):
-    docs = []
+def sync(browsers: dict, estimate_cost: bool = False):
+    docs: list[Document] = []
 
     for browser, config in browsers.items():
         try:
@@ -36,6 +39,9 @@ def sync(browsers: dict):
             docs.extend(loader.lazy_load())
 
     logger.debug(f"{len(docs)} Bookmarks loaded")
+
+    if estimate_cost:
+        return _estimate_cost(docs)
 
     if docs:
         store_documents(docs)
@@ -74,3 +80,32 @@ def _log_bookmark_source(browser: Browser, platform_config: dict):
         pass
 
     logger.debug("Loading bookmarks from %s", path)
+
+
+def _estimate_cost(docs: list[Document]) -> float:
+    embedding = _get_embedding_store()
+
+    # using _get_embedding_store here means that it's more likely that the model we are using
+    # in the actual embedding is the one we use for cost estimation
+    # however note that .model here is not part of the contract for Embeddings
+    # so this is a bit of a hack
+    # if we add more embeddings options in the future, we need to re-evaluate this.
+    encoding = tiktoken.encoding_for_model(embedding.model)
+
+    logger.info(f"Estimating cost for {embedding.model}")
+
+    tokens: int = 0
+    for doc in docs:
+        tokens += len(encoding.encode(doc.page_content))
+
+    price = float(input(f"what is the current cost for {embedding.model} per million? (non-batch) "))
+
+    # price is often advertise per million; so find the price per token
+    price_per_token = price / 1_000_000
+
+    # given the number total tokens we have, apply the price per token
+    cost = tokens * price_per_token
+
+    logger.info(f"Estimated cost: ${cost} (tokens: {tokens}) ")
+
+    return cost

@@ -127,6 +127,9 @@ def test_sync_estimate_cost(
     mock_encoding.encode.return_value = "mocked_page_content" * 100  # The multiplier just simulates a larger document
     mock_tiktoken.encoding_for_model.return_value = mock_encoding
 
+    # At the time of writing ada v2 is priced at $0.100 per 1M tokens
+    # so this is what we are using for this unit test
+    # https://openai.com/api/pricing/
     mocked_input.return_value = "0.100"
 
     mocked_documents = [

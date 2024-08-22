@@ -16,7 +16,10 @@ def main():
     argparser = argparse.ArgumentParser(description="Bookworm - A LLM-powered bookmark search engine")
 
     sub_parsers = argparser.add_subparsers(dest="command", help="Available commands", required=True)
-    sub_parsers.add_parser("sync", help="Sync the bookmark database with the latest changes")
+
+    sync_parser = sub_parsers.add_parser("sync", help="Sync the bookmark database with the latest changes")
+    sync_parser.add_argument("--estimate-cost", action="store_true", default=False, help="Estimate the cost of syncing the bookmark database")
+
     sub_parsers.add_parser("ask", help="Search for a bookmark")
 
     args = argparser.parse_args(sys.argv[1:])
@@ -24,7 +27,7 @@ def main():
     logger.debug("Arguments: %s", args)
 
     if args.command == "sync":
-        sync(browsers)
+        sync(browsers, estimate_cost=args.estimate_cost)
 
     elif args.command == "ask":
         logger.info("What would you like to search for?")

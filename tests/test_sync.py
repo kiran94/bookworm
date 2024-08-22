@@ -1,3 +1,4 @@
+import os
 from getpass import getuser
 from unittest.mock import patch, Mock, call, ANY
 
@@ -5,12 +6,12 @@ from bookworm_genai.commands.sync import sync
 from bookworm_genai.integrations import browsers
 
 
-def _mock_browsers_config(platform: str = "linux"):
+def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] = ["DOC1", "DOC2"]):
     new_browsers = browsers.copy()
 
     for browser, config in new_browsers.items():
         mock_loader = Mock()
-        mock_loader.return_value.lazy_load.return_value = ["DOC1", "DOC2"]
+        mock_loader.return_value.lazy_load.return_value = mocked_documents
 
         config[platform]["bookmark_loader"] = mock_loader
 
@@ -98,3 +99,51 @@ def test_sync_platform_unsupported(mock_sys: Mock, mock_store_documents: Mock, c
         "Platform unsupported not supported for browser chrome",
         "Platform unsupported not supported for browser firefox",
     ]
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch.dict(browsers, _mock_browsers_config(), clear=True)
+@patch("builtins.input")
+@patch("bookworm_genai.commands.sync.tiktoken")
+@patch("bookworm_genai.commands.sync.glob")
+@patch("bookworm_genai.commands.sync.shutil")
+@patch("bookworm_genai.commands.sync.os.makedirs")
+@patch("bookworm_genai.commands.sync.store_documents")
+@patch("bookworm_genai.commands.sync.sys")
+def test_sync_estimate_cost(
+    mock_sys: Mock,
+    mock_store_documents: Mock,
+    mock_makedirs: Mock,
+    mock_shutil: Mock,
+    mock_glob: Mock,
+    mock_tiktoken: Mock,
+    mocked_input: Mock,
+    caplog,
+):
+    platform = "linux"
+    mock_sys.platform = platform
+
+    mock_encoding = Mock()
+    mock_encoding.encode.return_value = "mocked_page_content" * 100  # The multiplier just simulates a larger document
+    mock_tiktoken.encoding_for_model.return_value = mock_encoding
+
+    # At the time of writing ada v2 is priced at $0.100 per 1M tokens
+    # so this is what we are using for this unit test
+    # https://openai.com/api/pricing/
+    mocked_input.return_value = "0.100"
+
+    mocked_documents = [
+        Mock(page_content="mocked_page_content"),
+    ]
+
+    browsers = _mock_browsers_config(mocked_documents=mocked_documents)
+    cost = sync(browsers, estimate_cost=True)
+
+    assert not mock_store_documents.called
+    assert mock_encoding.encode.call_args_list == [
+        call("mocked_page_content"),
+        call("mocked_page_content"),
+        call("mocked_page_content"),
+    ]
+
+    assert cost == 0.0005700000000000001

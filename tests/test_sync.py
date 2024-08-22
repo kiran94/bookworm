@@ -1,3 +1,4 @@
+import os
 from getpass import getuser
 from unittest.mock import patch, Mock, call, ANY
 
@@ -100,6 +101,7 @@ def test_sync_platform_unsupported(mock_sys: Mock, mock_store_documents: Mock, c
     ]
 
 
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
 @patch.dict(browsers, _mock_browsers_config(), clear=True)
 @patch("builtins.input")
 @patch("bookworm_genai.commands.sync.tiktoken")

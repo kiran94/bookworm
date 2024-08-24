@@ -35,8 +35,8 @@ browsers = {
                 "text_content": False,
             },
         },
-        "win32": {},
-        "darwin": {},
+        # "win32": {},
+        # "darwin": {},
     },
     Browser.CHROME: {
         "linux": {
@@ -47,7 +47,7 @@ browsers = {
                 "text_content": False,
             },
         },
-        "win32": {},
+        # "win32": {},
         "darwin": {
             "bookmark_loader": JSONLoader,
             "bookmark_loader_kwargs": {
@@ -88,7 +88,7 @@ browsers = {
                 "to": "/tmp/bookworm/firefox.sqlite",
             },
         },
-        "win32": {},
-        "darwin": {},
+        # "win32": {},
+        # "darwin": {},
     },
 }

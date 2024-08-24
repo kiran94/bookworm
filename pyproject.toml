@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bookworm_genai"
-version = "0.3.0"
+version = "0.4.0"
 description = "Bookworm - A LLM-powered bookmark search engine"
 authors = ["kiran94"]
 readme = "README.md"

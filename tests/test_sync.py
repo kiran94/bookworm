@@ -27,7 +27,7 @@ def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] =
     return new_browsers
 
 
-def _collect_browser_calls(platform: str) -> tuple[list[str], list[call]]:
+def _collect_browser_calls(platform: str, browsers: dict) -> tuple[list[str], list[call]]:
     collected_file_paths: list[str] = []
     collected_loader_calls: list[call] = []
 
@@ -64,7 +64,7 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     browsers = _mock_browsers_config()
     sync(browsers)
 
-    collected_file_paths, collected_loader_calls = _collect_browser_calls(platform)
+    collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
 
     assert collected_file_paths == [
         f"/home/{user}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks",
@@ -106,7 +106,7 @@ def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     browsers = _mock_browsers_config(platform)
     sync(browsers)
 
-    collected_file_paths, collected_loader_calls = _collect_browser_calls(platform)
+    collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
 
     assert collected_file_paths == [f"/home/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks"]
     assert collected_loader_calls == [

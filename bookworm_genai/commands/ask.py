@@ -78,6 +78,11 @@ def _get_llm() -> BaseChatModel:
 
     if os.environ.get("AZURE_OPENAI_API_KEY"):
         # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html
+
+        azure_deployment = os.environ.get("AZURE_OPENAI_DEPLOYMENT")
+        if azure_deployment:
+            kwargs["deployment_name"] = azure_deployment
+
         return AzureChatOpenAI(**kwargs)
 
     elif os.environ.get("OPENAI_API_KEY"):
@@ -89,5 +94,5 @@ def _get_llm() -> BaseChatModel:
             LLM service could not be configured. Ensure you have OPENAI_API_KEY or AZURE_OPENAI_API_KEY.
 
             If you are using OpenAI then please ensure you have the OPENAI_API_KEY environment variable set.
-            If you are using Azure OpenAI then please ensure you have the AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT + OPENAI_API_VERSION environment variables set.
+            If you are using Azure OpenAI then please ensure you have the AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT + OPENAI_API_VERSION environment variables set. Also consider setting AZURE_OPENAI_DEPLOYMENT.
         """)

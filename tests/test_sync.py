@@ -13,7 +13,10 @@ def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] =
         mock_loader = Mock()
         mock_loader.return_value.lazy_load.return_value = mocked_documents
 
-        config[platform]["bookmark_loader"] = mock_loader
+        try:
+            config[platform]["bookmark_loader"] = mock_loader
+        except KeyError:
+            continue
 
         if "db" in config[platform]["bookmark_loader_kwargs"]:
             mock_sqlite = Mock()
@@ -24,26 +27,14 @@ def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] =
     return new_browsers
 
 
-@patch.dict(browsers, _mock_browsers_config(), clear=True)
-@patch("bookworm_genai.commands.sync.glob")
-@patch("bookworm_genai.commands.sync.shutil")
-@patch("bookworm_genai.commands.sync.os.makedirs")
-@patch("bookworm_genai.commands.sync.store_documents")
-@patch("bookworm_genai.commands.sync.sys")
-def test_sync(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, mock_shutil: Mock, mock_glob: Mock):
-    platform = "linux"
-
-    mock_sys.platform = platform
-    user = getuser()
-    mock_glob.glob.return_value = ["/mocked/firefox.sqlite"]
-
-    browsers = _mock_browsers_config()
-    sync(browsers)
-
+def _collect_browser_calls(platform: str) -> tuple[list[str], list[call]]:
     collected_file_paths: list[str] = []
     collected_loader_calls: list[call] = []
 
     for browser, config in browsers.items():
+        if platform not in config:
+            continue
+
         if "file_path" in config[platform]["bookmark_loader_kwargs"]:
             collected_file_paths.append(config[platform]["bookmark_loader_kwargs"]["file_path"])
         elif "db" in config[platform]["bookmark_loader_kwargs"]:
@@ -53,6 +44,27 @@ def test_sync(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, m
                 collected_file_paths.append(path._engine.url)
 
         collected_loader_calls.extend(config[platform]["bookmark_loader"].call_args_list)
+
+    return collected_file_paths, collected_loader_calls
+
+
+@patch.dict(browsers, _mock_browsers_config(), clear=True)
+@patch("bookworm_genai.commands.sync.glob")
+@patch("bookworm_genai.commands.sync.shutil")
+@patch("bookworm_genai.commands.sync.os.makedirs")
+@patch("bookworm_genai.commands.sync.store_documents")
+@patch("bookworm_genai.commands.sync.sys")
+def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, mock_shutil: Mock, mock_glob: Mock):
+    platform = "linux"
+
+    mock_sys.platform = platform
+    user = getuser()
+    mock_glob.glob.return_value = ["/mocked/firefox.sqlite"]
+
+    browsers = _mock_browsers_config()
+    sync(browsers)
+
+    collected_file_paths, collected_loader_calls = _collect_browser_calls(platform)
 
     assert collected_file_paths == [
         f"/home/{user}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks",
@@ -77,6 +89,33 @@ def test_sync(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, m
     assert mock_store_documents.call_args_list == [call(["DOC1", "DOC2", "DOC1", "DOC2", "DOC1", "DOC2"])]
     assert mock_makedirs.call_args_list == [call("/tmp/bookworm", exist_ok=True)]
     assert mock_shutil.copy.call_args_list == [call(mock_glob.glob.return_value[0], "/tmp/bookworm/firefox.sqlite")]
+
+
+@patch.dict(browsers, _mock_browsers_config(), clear=True)
+@patch("bookworm_genai.commands.sync.glob")
+@patch("bookworm_genai.commands.sync.shutil")
+@patch("bookworm_genai.commands.sync.os.makedirs")
+@patch("bookworm_genai.commands.sync.store_documents")
+@patch("bookworm_genai.commands.sync.sys")
+def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: Mock, mock_shutil: Mock, mock_glob: Mock):
+    platform = "darwin"
+
+    mock_sys.platform = platform
+    user = getuser()
+
+    browsers = _mock_browsers_config(platform)
+    sync(browsers)
+
+    collected_file_paths, collected_loader_calls = _collect_browser_calls(platform)
+
+    assert collected_file_paths == [f"/home/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks"]
+    assert collected_loader_calls == [
+        call(
+            file_path=f"/home/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks",
+            jq_schema='\n  [.roots.bookmark_bar.children, .roots.other.children] |\n  flatten |\n  .. |\n  objects |\n  select(.type == "url")\n',
+            text_content=False,
+        )
+    ]
 
 
 @patch("bookworm_genai.commands.sync.store_documents")

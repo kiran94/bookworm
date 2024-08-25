@@ -35,8 +35,8 @@ browsers = {
                 "text_content": False,
             },
         },
-        "win32": {},
-        "darwin": {},
+        # "win32": {},
+        # "darwin": {},
     },
     Browser.CHROME: {
         "linux": {
@@ -47,8 +47,15 @@ browsers = {
                 "text_content": False,
             },
         },
-        "win32": {},
-        "darwin": {},
+        # "win32": {},
+        "darwin": {
+            "bookmark_loader": JSONLoader,
+            "bookmark_loader_kwargs": {
+                "file_path": os.path.expanduser("~/Library/Application Support/Google/Chrome/Default/Bookmarks"),
+                "jq_schema": _CHROMIUM_JQ_COMMAND,
+                "text_content": False,
+            },
+        },
     },
     Browser.FIREFOX: {
         "linux": {
@@ -81,7 +88,7 @@ browsers = {
                 "to": "/tmp/bookworm/firefox.sqlite",
             },
         },
-        "win32": {},
-        "darwin": {},
+        # "win32": {},
+        # "darwin": {},
     },
 }

@@ -63,6 +63,28 @@ def test_bookmark_chain_ask(
 @patch("bookworm_genai.commands.ask.duckdb")
 @patch("bookworm_genai.commands.ask._get_embedding_store")
 @patch("bookworm_genai.commands.ask._get_local_store")
+def test_bookmark_chain_ask_n_parameter(
+    mock_local_store: Mock,
+    mock_embedding_store: Mock,
+    mock_duckdb: Mock,
+    mock_duckdb_vector: Mock,
+    mock_chatopenai: Mock,
+    mock_chat_prompt_template: Mock,
+):
+    n = 15
+    with BookmarkChain(vector_store_search_n=n):
+        pass
+
+    mock_duckdb_vector.return_value.as_retriever.assert_called_once_with(search_kwargs={"k": n})
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("bookworm_genai.commands.ask.ChatPromptTemplate")
+@patch("bookworm_genai.commands.ask.ChatOpenAI")
+@patch("bookworm_genai.commands.ask.DuckDBVectorStore")
+@patch("bookworm_genai.commands.ask.duckdb")
+@patch("bookworm_genai.commands.ask._get_embedding_store")
+@patch("bookworm_genai.commands.ask._get_local_store")
 def test_bookmark_chain_is_valid(
     mock_local_store: Mock,
     mock_embedding_store: Mock,

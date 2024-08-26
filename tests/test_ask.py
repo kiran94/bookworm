@@ -46,6 +46,7 @@ def test_bookmark_chain_ask(
 
     mock_duckdb.connect.assert_called_once_with("/test/bookmark.duckdb", read_only=False)
     mock_duckdb_vector.assert_called_once_with(connection=mock_duckdb_connection, embedding=mock_embedding)
+    mock_duckdb_vector.return_value.as_retriever.assert_called_once_with(search_kwargs={"k": 3})
     assert mock_duckdb_connection.close.called
 
     mock_chatopenai.assert_called_once_with(temperature=0.0)
@@ -53,6 +54,28 @@ def test_bookmark_chain_ask(
     mock_chat_prompt_template.from_messages.assert_called_once_with([("system", _system_message), ("human", "{query}")])
 
     mock_chain.invoke.assert_called_once_with("test")
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("bookworm_genai.commands.ask.ChatPromptTemplate")
+@patch("bookworm_genai.commands.ask.ChatOpenAI")
+@patch("bookworm_genai.commands.ask.DuckDBVectorStore")
+@patch("bookworm_genai.commands.ask.duckdb")
+@patch("bookworm_genai.commands.ask._get_embedding_store")
+@patch("bookworm_genai.commands.ask._get_local_store")
+def test_bookmark_chain_ask_n_parameter(
+    mock_local_store: Mock,
+    mock_embedding_store: Mock,
+    mock_duckdb: Mock,
+    mock_duckdb_vector: Mock,
+    mock_chatopenai: Mock,
+    mock_chat_prompt_template: Mock,
+):
+    n = 15
+    with BookmarkChain(vector_store_search_n=n):
+        pass
+
+    mock_duckdb_vector.return_value.as_retriever.assert_called_once_with(search_kwargs={"k": n})
 
 
 @patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)

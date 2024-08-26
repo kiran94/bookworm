@@ -20,7 +20,8 @@ def main():
     sync_parser = sub_parsers.add_parser("sync", help="Sync the bookmark database with the latest changes")
     sync_parser.add_argument("--estimate-cost", action="store_true", default=False, help="Estimate the cost of syncing the bookmark database")
 
-    sub_parsers.add_parser("ask", help="Search for a bookmark")
+    ask_parser = sub_parsers.add_parser("ask", help="Search for a bookmark")
+    ask_parser.add_argument("-n", "--top-n", type=int, default=3, help="Number of bookmarks to return")
 
     args = argparser.parse_args(sys.argv[1:])
 
@@ -35,7 +36,7 @@ def main():
 
         logger.debug("query: %s", query)
 
-        with BookmarkChain() as bookmark_chain:
+        with BookmarkChain(vector_store_search_n=args.top_n) as bookmark_chain:
             if not bookmark_chain.is_valid():
                 logger.debug("bookmark chain is not valid, exiting early.")
                 return

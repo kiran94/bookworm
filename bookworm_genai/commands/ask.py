@@ -26,7 +26,7 @@ The bookmarks available are from the context:
 
 
 class BookmarkChain:
-    def __init__(self):
+    def __init__(self, vector_store_search_n: int = 3):
         full_database_path = _get_local_store()
         logger.debug("Connecting to vector database at: %s", full_database_path)
         self._duckdb_connection = duckdb.connect(full_database_path, read_only=False)
@@ -37,7 +37,9 @@ class BookmarkChain:
 
         prompt = ChatPromptTemplate.from_messages([("system", _system_message), ("human", "{query}")])
 
-        self.chain = {"context": self.vector_store.as_retriever(), "query": RunnablePassthrough()} | prompt | llm
+        search_kwargs = {"k": vector_store_search_n}
+
+        self.chain = {"context": self.vector_store.as_retriever(search_kwargs=search_kwargs), "query": RunnablePassthrough()} | prompt | llm
 
     def ask(self, query: str) -> Bookmarks:
         logger.debug("Searching for bookmarks with query: %s", query)

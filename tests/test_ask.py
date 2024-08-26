@@ -46,6 +46,7 @@ def test_bookmark_chain_ask(
 
     mock_duckdb.connect.assert_called_once_with("/test/bookmark.duckdb", read_only=False)
     mock_duckdb_vector.assert_called_once_with(connection=mock_duckdb_connection, embedding=mock_embedding)
+    mock_duckdb_vector.return_value.as_retriever.assert_called_once_with(search_kwargs={"k": 3})
     assert mock_duckdb_connection.close.called
 
     mock_chatopenai.assert_called_once_with(temperature=0.0)

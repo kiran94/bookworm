@@ -22,6 +22,7 @@ def main():
 
     ask_parser = sub_parsers.add_parser("ask", help="Search for a bookmark")
     ask_parser.add_argument("-n", "--top-n", type=int, default=3, help="Number of bookmarks to return")
+    ask_parser.add_argument("-q", "--query", help="The Search Query")
 
     args = argparser.parse_args(sys.argv[1:])
 
@@ -31,8 +32,11 @@ def main():
         sync(browsers, estimate_cost=args.estimate_cost)
 
     elif args.command == "ask":
-        logger.info("What would you like to search for?")
-        query = input("> ")
+        if not args.query:
+            logger.info("What would you like to search for?")
+            query = input("> ")
+        else:
+            query = args.query
 
         logger.debug("query: %s", query)
 
@@ -41,6 +45,7 @@ def main():
                 logger.debug("bookmark chain is not valid, exiting early.")
                 return
 
+            logger.info("Searching for bookmarks...")
             bookmarks = bookmark_chain.ask(query)
 
         if not bookmarks.bookmarks:

@@ -23,6 +23,11 @@ bookworm sync
 # Ask questions against the bookmark database
 bookworm ask
 
+# Ask questions against the bookmark database
+# Specify the query when invoking the command
+# If you omit this then you will be asked for a query when the tool is running
+bookworm ask -q pandas
+
 # Ask questions against the bookmark database and specify the number of results that should come back
 bookworm ask -n 1
 ```

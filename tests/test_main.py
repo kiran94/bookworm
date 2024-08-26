@@ -50,6 +50,31 @@ def test_main_ask(mock_sys: Mock, mock_bookmark_chain: Mock, mock_input: Mock):
 @patch("builtins.input")
 @patch("bookworm_genai.__main__.BookmarkChain")
 @patch("bookworm_genai.__main__.sys")
+def test_main_ask_query(mock_sys: Mock, mock_bookmark_chain: Mock, mock_input: Mock):
+    query = "dummy search query"
+
+    mock_sys.argv = ["script", "ask", "-q", query]
+    mock_input.side_effect = ["0"]
+
+    bc = Mock()
+    bc.is_valid.return_value = True
+    bc.ask.return_value = Mock(
+        bookmarks=[
+            Mock(title="first", url="http://google.com", source="/file/hello.txt"),
+            Mock(title="second", url="http://google.com", source="/file/hello.txt"),
+        ]
+    )
+
+    mock_bookmark_chain.return_value.__enter__.return_value = bc
+
+    main()
+
+    assert bc.ask.call_args_list == [call(query)]
+
+
+@patch("builtins.input")
+@patch("bookworm_genai.__main__.BookmarkChain")
+@patch("bookworm_genai.__main__.sys")
 def test_main_ask_not_valid(mock_sys: Mock, mock_bookmark_chain: Mock, mock_input: Mock):
     mock_sys.argv = ["script", "ask"]
     mock_input.side_effect = ["pandas column", "0"]

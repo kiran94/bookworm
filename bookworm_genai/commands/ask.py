@@ -3,7 +3,7 @@ import logging
 
 import duckdb
 from langchain_community.vectorstores import DuckDB as DuckDBVectorStore
-from langchain_openai import ChatOpenAI, AzureChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -78,23 +78,9 @@ def _get_llm() -> BaseChatModel:
         "temperature": 0.0,
     }
 
-    if os.environ.get("AZURE_OPENAI_API_KEY"):
-        # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html
-
-        azure_deployment = os.environ.get("AZURE_OPENAI_DEPLOYMENT")
-        if azure_deployment:
-            kwargs["deployment_name"] = azure_deployment
-
-        return AzureChatOpenAI(**kwargs)
-
-    elif os.environ.get("OPENAI_API_KEY"):
+    if os.environ.get("OPENAI_API_KEY"):
         # https://api.python.langchain.com/en/latest/chat_models/langchain_openai.chat_models.base.ChatOpenAI.html
         return ChatOpenAI(**kwargs)
 
     else:
-        raise ValueError("""
-            LLM service could not be configured. Ensure you have OPENAI_API_KEY or AZURE_OPENAI_API_KEY.
-
-            If you are using OpenAI then please ensure you have the OPENAI_API_KEY environment variable set.
-            If you are using Azure OpenAI then please ensure you have the AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT + OPENAI_API_VERSION environment variables set. Also consider setting AZURE_OPENAI_DEPLOYMENT.
-        """)
+        raise ValueError('LLM service could not be configured. Ensure you have OPENAI_API_KEY. If you are using OpenAI then please ensure you have the OPENAI_API_KEY environment variable set.')

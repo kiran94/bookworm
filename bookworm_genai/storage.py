@@ -6,7 +6,7 @@ from platformdirs import PlatformDirs
 from langchain_community.vectorstores import DuckDB as DuckDBVectorStore
 from langchain_core.documents import Document
 from langchain_core.embeddings.embeddings import Embeddings
-from langchain_openai.embeddings import OpenAIEmbeddings, AzureOpenAIEmbeddings
+from langchain_openai.embeddings import OpenAIEmbeddings
 
 logger = logging.getLogger(__name__)
 
@@ -37,20 +37,10 @@ def _get_local_store() -> str:
 
 
 def _get_embedding_store() -> Embeddings:
-    if os.environ.get("AZURE_OPENAI_API_KEY", None):
-        logger.debug("Using Azure OpenAI Embeddings")
-        # https://api.python.langchain.com/en/latest/embeddings/langchain_openai.embeddings.azure.AzureOpenAIEmbeddings.html
-        return AzureOpenAIEmbeddings()
-
-    elif os.environ.get("OPENAI_API_KEY", None):
+    if os.environ.get("OPENAI_API_KEY", None):
         logger.debug("Using OpenAI Embeddings")
         # https://api.python.langchain.com/en/latest/embeddings/langchain_openai.embeddings.base.OpenAIEmbeddings.html
         return OpenAIEmbeddings()
 
     else:
-        raise ValueError("""
-            Embeddings service could not be configured. Ensure you have OPENAI_API_KEY or AZURE_OPENAI_API_KEY.
-
-            If you are using OpenAI then please ensure you have the OPENAI_API_KEY environment variable set.
-            If you are using Azure OpenAI then please ensure you have the AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT environment variable set.
-        """)
+        raise ValueError('Embeddings service could not be configured. Ensure you have OPENAI_API_KEY set.')

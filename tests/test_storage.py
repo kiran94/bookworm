@@ -2,9 +2,8 @@ import os
 from unittest.mock import patch, Mock, call
 
 import pytest
-from langchain_openai.embeddings import AzureOpenAIEmbeddings
 
-from bookworm_genai.storage import store_documents, _get_embedding_store
+from bookworm_genai.storage import store_documents
 
 
 @patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
@@ -47,8 +46,3 @@ def test_no_proper_embedding_environment(
 
     with pytest.raises(ValueError, match="Embeddings service could not be configured"):
         store_documents(docs)
-
-
-@patch.dict(os.environ, {"AZURE_OPENAI_API_KEY": "secret", "AZURE_OPENAI_ENDPOINT": "https://example-resource.azure.openai.com/"}, clear=True)
-def test_get_embedding_store_azure():
-    assert isinstance(_get_embedding_store(), AzureOpenAIEmbeddings)

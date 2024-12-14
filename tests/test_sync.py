@@ -1,6 +1,9 @@
 import os
 from getpass import getuser
+import sys
 from unittest.mock import patch, Mock, call, ANY
+
+import pytest
 
 from bookworm_genai.commands.sync import sync
 from bookworm_genai.integrations import browsers
@@ -48,6 +51,7 @@ def _collect_browser_calls(platform: str, browsers: dict) -> tuple[list[str], li
     return collected_file_paths, collected_loader_calls
 
 
+@pytest.mark.skipif(sys.platform != 'linux', reason='this test is only for linux')
 @patch.dict(browsers, _mock_browsers_config(), clear=True)
 @patch("bookworm_genai.commands.sync.glob")
 @patch("bookworm_genai.commands.sync.shutil")
@@ -91,6 +95,7 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     assert mock_shutil.copy.call_args_list == [call(mock_glob.glob.return_value[0], "/tmp/bookworm/firefox.sqlite")]
 
 
+@pytest.mark.skipif(sys.platform != 'darwin', reason='this test is only for linux')
 @patch.dict(browsers, _mock_browsers_config(), clear=True)
 @patch("bookworm_genai.commands.sync.glob")
 @patch("bookworm_genai.commands.sync.shutil")

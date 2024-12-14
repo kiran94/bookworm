@@ -37,7 +37,7 @@ The `sync` process currently supports the following configurations:
 | Operating System   | Google Chrome   | Mozilla Firefox   | Brave   | Microsoft Edge   |
 | ------------------ | --------------- | ----------------- | ------- | ---------------- |
 | **Linux**          | ✅              | ✅                | ✅      | ❌               |
-| **macOS**          | ✅              | ❌                | ❌      | ❌               |
+| **macOS**          | ✅              | ✅                | ❌      | ❌               |
 | **Windows**        | ❌              | ❌                | ❌      | ❌               |
 
 ## Processes

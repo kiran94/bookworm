@@ -2,7 +2,6 @@ import os
 from unittest.mock import patch, Mock
 
 import pytest
-from langchain_openai import AzureChatOpenAI
 
 from bookworm_genai.commands.ask import BookmarkChain, _system_message, _get_llm
 from bookworm_genai.models import Bookmarks
@@ -157,23 +156,8 @@ def test_bookmark_chain_is_valid_invalid_response(
         assert not bc.is_valid()
 
 
-@patch.dict(os.environ, {"AZURE_OPENAI_API_KEY": "secret", "OPENAI_API_VERSION": "version", "AZURE_OPENAI_ENDPOINT": "endpoint"}, clear=True)
-def test_get_llm_azure():
-    assert isinstance(_get_llm(), AzureChatOpenAI)
-
 
 @patch.dict(os.environ, {}, clear=True)
 def test_get_llm_no_env():
     with pytest.raises(ValueError, match="LLM service could not be configured"):
         _get_llm()
-
-
-@patch.dict(os.environ, {"AZURE_OPENAI_API_KEY": "secret", "AZURE_OPENAI_DEPLOYMENT": "DUMMY"}, clear=True)
-@patch("bookworm_genai.commands.ask.AzureChatOpenAI")
-def test_get_llm_azure_deployment(mock_azure_chat_openai: Mock):
-    _get_llm()
-
-    assert mock_azure_chat_openai.call_count == 1
-
-    _, kwargs = mock_azure_chat_openai.call_args_list[0]
-    assert kwargs["deployment_name"] == "DUMMY"

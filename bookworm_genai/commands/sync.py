@@ -21,11 +21,12 @@ def sync(browsers: dict, estimate_cost: bool = False):
         try:
             platform_config = config[sys.platform]
         except KeyError:
-            logger.warning(f"Platform {sys.platform} not supported for browser {browser.value}")
+            logger.warning(f'🔄 browser {browser.value} is not supported on {sys.platform} yet')
             continue
         else:
             if "copy" in platform_config:
                 _copy(platform_config["copy"])
+
 
             _log_bookmark_source(browser, platform_config)
 
@@ -60,7 +61,7 @@ def _copy(config: dict):
 
 
 def _log_bookmark_source(browser: Browser, platform_config: dict):
-    logger.info("Loading bookmarks from %s", browser.value.title())
+    logger.info(f'✅ browser {browser.value} bookmarks loaded!')
 
     path = ""
 

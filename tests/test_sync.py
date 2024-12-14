@@ -95,7 +95,7 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     assert mock_shutil.copy.call_args_list == [call(mock_glob.glob.return_value[0], "/tmp/bookworm/firefox.sqlite")]
 
 
-@pytest.mark.skipif(sys.platform != 'darwin', reason='this test is only for linux')
+@pytest.mark.skipif(sys.platform != 'darwin', reason='this test is only for macos')
 @patch.dict(browsers, _mock_browsers_config(), clear=True)
 @patch("bookworm_genai.commands.sync.glob")
 @patch("bookworm_genai.commands.sync.shutil")
@@ -113,10 +113,10 @@ def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
 
     collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
 
-    assert collected_file_paths == [f"/home/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks"]
+    assert collected_file_paths == [f"/Users/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks"]
     assert collected_loader_calls == [
         call(
-            file_path=f"/home/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks",
+            file_path=f"/Users/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks",
             jq_schema='\n  [.roots.bookmark_bar.children, .roots.other.children] |\n  flatten |\n  .. |\n  objects |\n  select(.type == "url")\n',
             text_content=False,
         )

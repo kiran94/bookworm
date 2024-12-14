@@ -113,13 +113,21 @@ def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
 
     collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
 
-    assert collected_file_paths == [f"/Users/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks"]
+    assert collected_file_paths == [
+        # chrome
+        f"/Users/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks",
+        # firefox
+        'mocked_database_connection',
+    ]
     assert collected_loader_calls == [
+        # chrome
         call(
             file_path=f"/Users/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks",
             jq_schema='\n  [.roots.bookmark_bar.children, .roots.other.children] |\n  flatten |\n  .. |\n  objects |\n  select(.type == "url")\n',
             text_content=False,
-        )
+        ),
+        # firefox
+        call(db=ANY, query=ANY, source_columns=["id", "dateAdded", "lastModified"], page_content_mapper=ANY),
     ]
 
 

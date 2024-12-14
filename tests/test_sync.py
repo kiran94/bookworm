@@ -139,9 +139,9 @@ def test_sync_platform_unsupported(mock_sys: Mock, mock_store_documents: Mock, c
     logs = [log.message for log in caplog.records if log.levelname == "WARNING"]
     logs.sort()
     assert logs == [
-        "Platform unsupported not supported for browser brave",
-        "Platform unsupported not supported for browser chrome",
-        "Platform unsupported not supported for browser firefox",
+       '🔄 browser brave is not supported on unsupported yet',
+       '🔄 browser chrome is not supported on unsupported yet',
+       '🔄 browser firefox is not supported on unsupported yet',
     ]
 
 

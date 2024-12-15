@@ -40,7 +40,14 @@ browsers = {
             },
         },
         # "win32": {},
-        # "darwin": {},
+        "darwin": {
+            "bookmark_loader": JSONLoader,
+            "bookmark_loader_kwargs": {
+                "file_path": os.path.expanduser("~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Bookmarks"),
+                "jq_schema": _CHROMIUM_JQ_COMMAND,
+                "text_content": False,
+            },
+        },
     },
     Browser.CHROME: {
         "linux": {

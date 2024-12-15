@@ -115,12 +115,20 @@ def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
 
     assert collected_file_paths == [
+        # brave
+        f'/Users/{user}/Library/Application Support/BraveSoftware/Brave-Browser/Default/Bookmarks',
         # chrome
         f"/Users/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks",
         # firefox
         'mocked_database_connection',
     ]
     assert collected_loader_calls == [
+        # brave
+        call(
+            file_path=f"/Users/{user}/Library/Application Support/BraveSoftware/Brave-Browser/Default/Bookmarks",
+            jq_schema='\n  [.roots.bookmark_bar.children, .roots.other.children] |\n  flatten |\n  .. |\n  objects |\n  select(.type == "url")\n',
+            text_content=False,
+        ),
         # chrome
         call(
             file_path=f"/Users/{user}/Library/Application Support/Google/Chrome/Default/Bookmarks",

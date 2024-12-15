@@ -10,6 +10,10 @@ class Browser(str, Enum):
     CHROME = "chrome"
     FIREFOX = "firefox"
 
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+
 
 _CHROMIUM_JQ_COMMAND = """
   [.roots.bookmark_bar.children, .roots.other.children] |

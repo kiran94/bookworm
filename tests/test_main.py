@@ -20,7 +20,7 @@ def test_main_sync(mock_sys: Mock, mock_sync: Mock, mock_browsers: Mock):
 
     main()
 
-    assert mock_sync.call_args_list == [call(mock_browsers, estimate_cost=False)]
+    assert mock_sync.call_args_list == [call(mock_browsers, estimate_cost=False, browser_filter=[])]
 
 
 @patch("builtins.input")

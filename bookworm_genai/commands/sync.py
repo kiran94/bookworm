@@ -14,10 +14,16 @@ from bookworm_genai.storage import store_documents, _get_embedding_store
 logger = logging.getLogger(__name__)
 
 
-def sync(browsers: dict, estimate_cost: bool = False):
+def sync(browsers: dict, estimate_cost: bool = False, browser_filter: list[str] = []):
     docs: list[Document] = []
 
     for browser, config in browsers.items():
+        browser: Browser = browser
+
+        if browser_filter and (browser.value not in browser_filter):
+            logger.debug(f'browser {browser.value} skipped due to filter')
+            continue
+
         try:
             platform_config = config[sys.platform]
         except KeyError:

@@ -6,7 +6,7 @@ from unittest.mock import patch, Mock, call, ANY
 import pytest
 
 from bookworm_genai.commands.sync import sync
-from bookworm_genai.integrations import browsers
+from bookworm_genai.integrations import Browser, browsers
 
 
 def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] = ["DOC1", "DOC2"]):
@@ -16,16 +16,17 @@ def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] =
         mock_loader = Mock()
         mock_loader.return_value.lazy_load.return_value = mocked_documents
 
-        try:
-            config[platform]["bookmark_loader"] = mock_loader
-        except KeyError:
-            continue
+        for platform in config:
+            try:
+                config[platform]["bookmark_loader"] = mock_loader
+            except KeyError:
+                continue
 
-        if "db" in config[platform]["bookmark_loader_kwargs"]:
-            mock_sqlite = Mock()
-            mock_sqlite.return_value.return_value._engine.url = "mocked_database_connection"
+            if "db" in config[platform]["bookmark_loader_kwargs"]:
+                mock_sqlite = Mock()
+                mock_sqlite.return_value.return_value._engine.url = "mocked_database_connection"
 
-            config[platform]["bookmark_loader_kwargs"]["db"] = mock_sqlite
+                config[platform]["bookmark_loader_kwargs"]["db"] = mock_sqlite
 
     return new_browsers
 
@@ -199,3 +200,26 @@ def test_sync_estimate_cost(
     ]
 
     assert cost == 0.0005700000000000001
+
+@patch("bookworm_genai.commands.sync.glob")
+@patch("bookworm_genai.commands.sync.shutil")
+@patch("bookworm_genai.commands.sync.os.makedirs")
+@patch("bookworm_genai.commands.sync.store_documents")
+@patch("bookworm_genai.commands.sync.sys")
+def test_sync_browser_filter(
+    mock_sys: Mock,
+    mock_store_documents: Mock,
+    mock_makedirs: Mock,
+    mock_shutil: Mock,
+    mock_glob: Mock):
+
+    browser_filter = [Browser.CHROME.value]
+
+    platform = 'darwin'
+    mock_sys.platform = platform
+
+    browsers = _mock_browsers_config()
+    sync(browsers, browser_filter=browser_filter)
+
+    assert browsers[Browser.CHROME][platform]['bookmark_loader'].called
+    assert not browsers[Browser.FIREFOX][platform]['bookmark_loader'].called

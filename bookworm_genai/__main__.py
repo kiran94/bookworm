@@ -2,7 +2,7 @@ import sys
 import logging
 import argparse
 
-from bookworm_genai.integrations import browsers
+from bookworm_genai.integrations import browsers, Browser
 from bookworm_genai.commands.sync import sync
 from bookworm_genai.commands.ask import BookmarkChain
 
@@ -19,6 +19,7 @@ def main():
 
     sync_parser = sub_parsers.add_parser("sync", help="Sync the bookmark database with the latest changes")
     sync_parser.add_argument("--estimate-cost", action="store_true", default=False, help="Estimate the cost of syncing the bookmark database")
+    sync_parser.add_argument("--browser-filter", default=[], help='Only sync a subset of browsers', choices=Browser.list())
 
     ask_parser = sub_parsers.add_parser("ask", help="Search for a bookmark")
     ask_parser.add_argument("-n", "--top-n", type=int, default=3, help="Number of bookmarks to return")
@@ -29,7 +30,7 @@ def main():
     logger.debug("Arguments: %s", args)
 
     if args.command == "sync":
-        sync(browsers, estimate_cost=args.estimate_cost)
+        sync(browsers, estimate_cost=args.estimate_cost, browser_filter=args.browser_filter)
 
     elif args.command == "ask":
         if not args.query:

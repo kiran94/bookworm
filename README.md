@@ -20,6 +20,9 @@ export OPENAI_API_KEY=
 # Run once and then anytime bookmarks across supported browsers changes
 bookworm sync
 
+# Sync bookmarks only from a specific browser
+bookworm sync --browser-filter chrome
+
 # Ask questions against the bookmark database
 bookworm ask
 

@@ -129,3 +129,23 @@ poetry install
 
 bookworm --help
 ```
+
+## Adding an Integration
+
+As you can see from [usage](#usage), bookworm supports various integrations but not all. If you find one that you want to support then a change is needed inside [integrations.py](./bookworm_genai/integrations.py).
+
+You can see in that file there is a variable called `browsers` that follows this structure:
+
+```python
+browsers = {
+    "BROWSER": {
+        "PLATFORM": {
+            ...
+        }
+    }
+}
+```
+
+So say you wanted to add Chrome support in Windows then you would go under the Chrome key and then add a `win32` key which has all the details. You can refer to existing examples but generally the contents of those details are *where* to find the bookmarks on the user's system along with how to *interpret* them.
+
+You can also find a full list of the document loaders supported [here](https://python.langchain.com/docs/integrations/document_loaders/).

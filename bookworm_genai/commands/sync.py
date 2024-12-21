@@ -93,7 +93,7 @@ def _log_bookmark_source(browser: Browser, platform_config: dict):
 def _estimate_cost(docs: list[Document]) -> float:
     embedding = _get_embedding_store()
 
-    # using _get_embedding_store here means that it's more likely that the model we are using
+    # NOTE: using _get_embedding_store here means that it's more likely that the model we are using
     # in the actual embedding is the one we use for cost estimation
     # however note that .model here is not part of the contract for Embeddings
     # so this is a bit of a hack

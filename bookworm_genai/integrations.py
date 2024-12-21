@@ -1,5 +1,7 @@
 import os
 from enum import Enum
+from typing import Any
+
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.document_loaders.sql_database import SQLDatabaseLoader
 from langchain_community.utilities.sql_database import SQLDatabase
@@ -23,13 +25,15 @@ _CHROMIUM_JQ_COMMAND = """
   select(.type == "url")
 """
 
+BrowserManifest = dict[Browser, dict[str, dict[str, Any]]]
+
 # Configuration for various browsers and details about them
 # The bookmark_file_path is the path to the bookmarks file for the browsers, in order for it to be used it must be used in conjunction with
 # os.path.expanduser as it may contain environment variables
 #
 # The platform configuration is keyed off the values from https://docs.python.org/3/library/sys.html#sys.platform
 #
-browsers = {
+browsers: BrowserManifest = {
     Browser.BRAVE: {
         "linux": {
             "bookmark_loader": JSONLoader,

@@ -4,6 +4,7 @@ import logging
 
 from platformdirs import PlatformDirs
 from langchain_community.vectorstores import DuckDB as DuckDBVectorStore
+from langchain_community.vectorstores.duckdb import DEFAULT_TABLE_NAME
 from langchain_core.documents import Document
 from langchain_core.embeddings.embeddings import Embeddings
 from langchain_openai.embeddings import OpenAIEmbeddings
@@ -18,10 +19,10 @@ def store_documents(docs: list[Document]):
 
     logger.info(f"vectorizing and storing {len(docs)} documents into {full_database_path}")
     with duckdb.connect(full_database_path) as conn:
-        logger.debug("dropping existing embeddings table if exists")
-        conn.execute("DROP TABLE IF EXISTS embeddings")
+        logger.debug(f"dropping existing embeddings table '{DEFAULT_TABLE_NAME}' if exists")
+        conn.execute(f"DROP TABLE IF EXISTS {DEFAULT_TABLE_NAME}")
 
-        logger.debug("loading documents")
+        logger.debug(f"loading {len(docs)} documents")
         DuckDBVectorStore.from_documents(docs, embeddings, connection=conn)
 
 

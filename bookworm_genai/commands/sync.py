@@ -3,7 +3,7 @@ import sys
 import glob
 import logging
 import shutil
-from typing import Union
+from typing import Optional, Union
 
 import tiktoken
 from langchain_core.documents import Document
@@ -90,7 +90,7 @@ def _log_bookmark_source(browser: Browser, platform_config: dict):
     logger.debug("Loading bookmarks from %s", path)
 
 
-def _estimate_cost(docs: list[Document]) -> float:
+def _estimate_cost(docs: list[Document], cost_per_million: Optional[float] = None) -> float:
     embedding = _get_embedding_store()
 
     # NOTE: using _get_embedding_store here means that it's more likely that the model we are using
@@ -106,7 +106,11 @@ def _estimate_cost(docs: list[Document]) -> float:
     for doc in docs:
         tokens += len(encoding.encode(doc.page_content))
 
-    price = float(input(f"what is the current cost for {embedding.model} per million? (non-batch) "))
+    if not cost_per_million:
+        # https://openai.com/api/pricing/
+        price = float(input(f"what is the current cost for {embedding.model} per million? (non-batch) "))
+    else:
+        price = cost_per_million
 
     # price is often advertise per million; so find the price per token
     price_per_token = price / 1_000_000

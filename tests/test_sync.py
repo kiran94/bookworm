@@ -5,7 +5,7 @@ from unittest.mock import patch, Mock, call, ANY
 
 import pytest
 
-from bookworm_genai.commands.sync import sync
+from bookworm_genai.commands.sync import _estimate_cost, sync
 from bookworm_genai.integrations import Browser, browsers
 
 
@@ -208,6 +208,24 @@ def test_sync_estimate_cost(
     ]
 
     assert cost == 0.0005700000000000001
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("builtins.input")
+@patch("bookworm_genai.commands.sync.tiktoken")
+def test_sync_estimate_cost_non_interactive(mock_tiktoken: Mock, mock_input: Mock):
+    mocked_documents = [
+        Mock(page_content="mocked_page_content"),
+    ]
+
+    mock_encoding = Mock()
+    mock_encoding.encode.return_value = "mocked_page_content" * 100  # The multiplier just simulates a larger document
+    mock_tiktoken.encoding_for_model.return_value = mock_encoding
+
+    cost = _estimate_cost(mocked_documents, cost_per_million=0.100)
+
+    assert cost == 0.00019
+    assert not mock_input.called
+
 
 @patch("bookworm_genai.commands.sync.glob")
 @patch("bookworm_genai.commands.sync.shutil")

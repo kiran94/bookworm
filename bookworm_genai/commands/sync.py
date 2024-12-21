@@ -3,18 +3,19 @@ import sys
 import glob
 import logging
 import shutil
+from typing import Union
 
 import tiktoken
 from langchain_core.documents import Document
 
-from bookworm_genai.integrations import Browser
+from bookworm_genai.integrations import Browser, browsers, BrowserManifest
 from bookworm_genai.storage import store_documents, _get_embedding_store
 
 
 logger = logging.getLogger(__name__)
 
 
-def sync(browsers: dict, estimate_cost: bool = False, browser_filter: list[str] = []):
+def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, browser_filter: list[str] = []) -> Union[None, float]:
     docs: list[Document] = []
 
     for browser, config in browsers.items():

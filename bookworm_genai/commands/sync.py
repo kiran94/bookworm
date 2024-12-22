@@ -32,8 +32,11 @@ def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, brow
             continue
         else:
             if "copy" in platform_config:
-                _copy(platform_config["copy"])
-
+                try:
+                    _copy(platform_config["copy"])
+                except BrowserBookmarkFileNotFound as e:
+                    logger.warning(f"🔄 browser {browser.value} skipped due to missing file '{e.file}'")
+                    continue
 
             _log_bookmark_source(browser, platform_config)
 
@@ -55,11 +58,18 @@ def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, brow
         store_documents(docs)
 
 
+
+
 def _copy(config: dict):
     logger.debug(f"Copying {config['from']} to {config['to']}")
 
     source = glob.glob(config["from"])
-    source = source[0]
+
+    try:
+        source = source[0]
+    except IndexError as e:
+        logger.debug(f"source {config['from']} not found")
+        raise BrowserBookmarkFileNotFound(config["from"]) from e
 
     directory = os.path.dirname(config["to"])
     os.makedirs(directory, exist_ok=True)
@@ -121,3 +131,13 @@ def _estimate_cost(docs: list[Document], cost_per_million: Optional[float] = Non
     logger.info(f"Estimated cost: ${cost} (tokens: {tokens}) ")
 
     return cost
+
+
+class BrowserBookmarkFileNotFound(Exception):
+    '''
+    Represents that a bookmark file on the local file system could not be found.
+    For example if a configuration is defined with a glob expression /my/path/*.sqlite but that path resolves to nothing.
+    '''
+    def __init__(self, file: str):
+        self.file = file
+        super().__init__(f"Could not resolve file: {file}")

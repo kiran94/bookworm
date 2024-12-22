@@ -5,7 +5,7 @@ from unittest.mock import patch, Mock, call, ANY
 
 import pytest
 
-from bookworm_genai.commands.sync import sync
+from bookworm_genai.commands.sync import _estimate_cost, sync
 from bookworm_genai.integrations import Browser, browsers
 
 
@@ -209,6 +209,24 @@ def test_sync_estimate_cost(
 
     assert cost == 0.0005700000000000001
 
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("builtins.input")
+@patch("bookworm_genai.commands.sync.tiktoken")
+def test_sync_estimate_cost_non_interactive(mock_tiktoken: Mock, mock_input: Mock):
+    mocked_documents = [
+        Mock(page_content="mocked_page_content"),
+    ]
+
+    mock_encoding = Mock()
+    mock_encoding.encode.return_value = "mocked_page_content" * 100  # The multiplier just simulates a larger document
+    mock_tiktoken.encoding_for_model.return_value = mock_encoding
+
+    cost = _estimate_cost(mocked_documents, cost_per_million=0.100)
+
+    assert cost == 0.00019
+    assert not mock_input.called
+
+
 @patch("bookworm_genai.commands.sync.glob")
 @patch("bookworm_genai.commands.sync.shutil")
 @patch("bookworm_genai.commands.sync.os.makedirs")
@@ -231,3 +249,47 @@ def test_sync_browser_filter(
 
     assert browsers[Browser.CHROME][platform]['bookmark_loader'].called
     assert not browsers[Browser.FIREFOX][platform]['bookmark_loader'].called
+
+
+
+@patch('bookworm_genai.commands.sync.store_documents')
+@patch('bookworm_genai.commands.sync.os')
+@patch('bookworm_genai.commands.sync.shutil')
+@patch('bookworm_genai.commands.sync.glob')
+def test_sync_copy_source_missing(mock_glob: Mock, mock_shutil: Mock, mock_os: Mock, mock_store_documents: Mock):
+
+    path_to_missing_file = "/path/to/missing/file"
+
+    mock_docs_loader = Mock()
+    mock_docs_loader.return_value.lazy_load.return_value = ["DOC1", "DOC2"]
+
+    browsers = {
+        # this one will fail and be skipped due to missing file
+        # ensure that even if this one fails, the next one will still be processed
+        Browser.FIREFOX: {
+            sys.platform: {
+                "bookmark_loader": Mock(),
+                "bookmark_loader_kwargs": {},
+                "copy": {
+                    "from": path_to_missing_file,
+                    "to": "/path/to/destination",
+                },
+            }
+        },
+        # this one will be processed
+        Browser.CHROME: {
+            sys.platform: {
+                "bookmark_loader": mock_docs_loader,
+                "bookmark_loader_kwargs": {},
+            }
+        },
+    }
+
+    mock_glob.glob.return_value = []
+
+    sync(browsers=browsers)
+
+    mock_glob.glob.assert_called_once_with(path_to_missing_file)
+
+    # ensures that even if the first browser fails, the second one still extracts docs and submits to storage
+    assert mock_store_documents.call_args_list == [call(["DOC1", "DOC2"])]

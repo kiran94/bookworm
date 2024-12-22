@@ -3,18 +3,19 @@ import sys
 import glob
 import logging
 import shutil
+from typing import Optional, Union
 
 import tiktoken
 from langchain_core.documents import Document
 
-from bookworm_genai.integrations import Browser
+from bookworm_genai.integrations import Browser, browsers, BrowserManifest
 from bookworm_genai.storage import store_documents, _get_embedding_store
 
 
 logger = logging.getLogger(__name__)
 
 
-def sync(browsers: dict, estimate_cost: bool = False, browser_filter: list[str] = []):
+def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, browser_filter: list[str] = []) -> Union[None, float]:
     docs: list[Document] = []
 
     for browser, config in browsers.items():
@@ -31,8 +32,11 @@ def sync(browsers: dict, estimate_cost: bool = False, browser_filter: list[str] 
             continue
         else:
             if "copy" in platform_config:
-                _copy(platform_config["copy"])
-
+                try:
+                    _copy(platform_config["copy"])
+                except BrowserBookmarkFileNotFound as e:
+                    logger.warning(f"🔄 browser {browser.value} skipped due to missing file '{e.file}'")
+                    continue
 
             _log_bookmark_source(browser, platform_config)
 
@@ -54,11 +58,18 @@ def sync(browsers: dict, estimate_cost: bool = False, browser_filter: list[str] 
         store_documents(docs)
 
 
+
+
 def _copy(config: dict):
     logger.debug(f"Copying {config['from']} to {config['to']}")
 
     source = glob.glob(config["from"])
-    source = source[0]
+
+    try:
+        source = source[0]
+    except IndexError as e:
+        logger.debug(f"source {config['from']} not found")
+        raise BrowserBookmarkFileNotFound(config["from"]) from e
 
     directory = os.path.dirname(config["to"])
     os.makedirs(directory, exist_ok=True)
@@ -89,10 +100,10 @@ def _log_bookmark_source(browser: Browser, platform_config: dict):
     logger.debug("Loading bookmarks from %s", path)
 
 
-def _estimate_cost(docs: list[Document]) -> float:
+def _estimate_cost(docs: list[Document], cost_per_million: Optional[float] = None) -> float:
     embedding = _get_embedding_store()
 
-    # using _get_embedding_store here means that it's more likely that the model we are using
+    # NOTE: using _get_embedding_store here means that it's more likely that the model we are using
     # in the actual embedding is the one we use for cost estimation
     # however note that .model here is not part of the contract for Embeddings
     # so this is a bit of a hack
@@ -105,7 +116,11 @@ def _estimate_cost(docs: list[Document]) -> float:
     for doc in docs:
         tokens += len(encoding.encode(doc.page_content))
 
-    price = float(input(f"what is the current cost for {embedding.model} per million? (non-batch) "))
+    if not cost_per_million:
+        # https://openai.com/api/pricing/
+        price = float(input(f"what is the current cost for {embedding.model} per million? (non-batch) "))
+    else:
+        price = cost_per_million
 
     # price is often advertise per million; so find the price per token
     price_per_token = price / 1_000_000
@@ -116,3 +131,13 @@ def _estimate_cost(docs: list[Document]) -> float:
     logger.info(f"Estimated cost: ${cost} (tokens: {tokens}) ")
 
     return cost
+
+
+class BrowserBookmarkFileNotFound(Exception):
+    '''
+    Represents that a bookmark file on the local file system could not be found.
+    For example if a configuration is defined with a glob expression /my/path/*.sqlite but that path resolves to nothing.
+    '''
+    def __init__(self, file: str):
+        self.file = file
+        super().__init__(f"Could not resolve file: {file}")

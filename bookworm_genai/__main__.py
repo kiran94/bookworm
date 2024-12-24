@@ -2,6 +2,7 @@ import sys
 import logging
 import argparse
 
+from bookworm_genai import __version__
 from bookworm_genai.integrations import browsers, Browser
 from bookworm_genai.commands.sync import sync
 from bookworm_genai.commands.ask import BookmarkChain
@@ -10,10 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    logger.info("[bold green]Starting Bookworm 📖")
-    logger.debug("Running on platform '%s'", sys.platform)
-
     arg_parser = argparse.ArgumentParser(description="LLM-powered bookmark search engine")
+    arg_parser.add_argument('--version', action='version', version=__version__)
 
     sub_parsers = arg_parser.add_subparsers(dest="command", help="Available commands", required=True)
 
@@ -26,6 +25,9 @@ def main():
     ask_parser.add_argument("-q", "--query", help="The Search Query")
 
     args = arg_parser.parse_args(sys.argv[1:])
+
+    logger.info("[bold green]Starting Bookworm 📖")
+    logger.debug("Running on platform '%s'", sys.platform)
 
     logger.debug("Arguments: %s", args)
 

@@ -82,6 +82,19 @@ Firefox -->|load bookmarks|Bookworm
 Bookworm -->|vectorize bookmarks|EmbeddingsService-->|store embeddings|VectorStore
 ```
 
+<details>
+<summary>Details</summary>
+
+The vector database depicted above is stored locally on your machine. You can check it's location by running the following after installing this project:
+
+```python
+from platformdirs import PlatformDirs
+
+print(PlatformDirs('bookworm').user_data_dir)
+```
+
+</details>
+
 ---
 
 *`bookworm ask`*

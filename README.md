@@ -49,6 +49,9 @@ The `sync` process currently supports the following configurations:
 | **macOS**          | ✅              | ✅                | ✅      | ❌               |
 | **Windows**        | ❌              | ❌                | ❌      | ❌               |
 
+> [!TIP]
+> ✨ Want to contribute? See the [adding an integration](#adding-an-integration) section.
+
 ## Processes
 
 *`bookworm sync`*

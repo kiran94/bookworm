@@ -4,13 +4,19 @@
 
 > LLM-powered bookmark search engine
 
-`bookworm` allows you to search your locally stored bookmarks using human language.
+`bookworm` allows you to search from your local browser bookmarks using natural language. For times when you have a large collection of bookmarks and you can't quite remember where you put that one website you need at the moment.
 
 ## Install
 
 ```bash
 python -m pip install bookworm_genai
 ```
+
+> [!TIP]
+> If you are using [`uvx`](https://docs.astral.sh/uv/guides/tools/) then you can also just run this:
+> ```bash
+> uvx --from bookworm_genai bookworm --help
+> ```
 
 ## Usage
 
@@ -43,6 +49,9 @@ The `sync` process currently supports the following configurations:
 | **macOS**          | ✅              | ✅                | ✅      | ❌               |
 | **Windows**        | ❌              | ❌                | ❌      | ❌               |
 
+> [!TIP]
+> ✨ Want to contribute? See the [adding an integration](#adding-an-integration) section.
+
 ## Processes
 
 *`bookworm sync`*
@@ -72,6 +81,19 @@ Firefox -->|load bookmarks|Bookworm
 
 Bookworm -->|vectorize bookmarks|EmbeddingsService-->|store embeddings|VectorStore
 ```
+
+<details>
+<summary>Details</summary>
+
+The vector database depicted above is stored locally on your machine. You can check it's location by running the following after installing this project:
+
+```python
+from platformdirs import PlatformDirs
+
+print(PlatformDirs('bookworm').user_data_dir)
+```
+
+</details>
 
 ---
 

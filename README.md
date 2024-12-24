@@ -12,6 +12,12 @@
 python -m pip install bookworm_genai
 ```
 
+> [!TIP]
+> If you are using [`uvx`](https://docs.astral.sh/uv/guides/tools/) then you can also just run this:
+> ```bash
+> uvx --from bookworm_genai bookworm --help
+> ```
+
 ## Usage
 
 ```bash

@@ -4,7 +4,7 @@
 
 > LLM-powered bookmark search engine
 
-`bookworm` allows you search for your local browser bookmarks using natural language. For times when you have a large collection of bookmarks and you can't quite remember where you put that one website you need at the moment.
+`bookworm` allows you to search from your local browser bookmarks using natural language. For times when you have a large collection of bookmarks and you can't quite remember where you put that one website you need at the moment.
 
 ## Install
 

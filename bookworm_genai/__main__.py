@@ -61,9 +61,9 @@ def main():
         for index, bookmark in enumerate(bookmarks.bookmarks):
             if logger.isEnabledFor(logging.DEBUG):
                 # also shows the source of the bookmark
-                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ({bookmark.source})")  # pragma: no cover
+                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ([green]{bookmark.source}[/])")  # pragma: no cover
             else:
-                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link]")
+                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ([green]{bookmark.browser}[/])")
 
         logger.info("Press a number to open the bookmark:")
         while True:

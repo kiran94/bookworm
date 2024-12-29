@@ -1,4 +1,4 @@
-name: docker_linux
+name: docker
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
 jobs:
-  build:
+  linux:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:

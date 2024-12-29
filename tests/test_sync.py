@@ -92,13 +92,13 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
         call(db=ANY, query=ANY, source_columns=["id", "dateAdded", "lastModified"], page_content_mapper=ANY),
     ]
 
-    assert mock_store_documents.call_count == 1
+    assert mock_store_documents.call_count == 1, "store_documents should be called once"
 
     args, _ = mock_store_documents.call_args_list[0]
-    assert len(args) == 1
+    assert len(args) == 1, "store_documents should be called with one argument"
 
     stored_documents = args[0]
-    assert len(stored_documents) == 6
+    assert len(stored_documents) == 6, "store_documents should be called with 6 documents. 2 per browser"
 
     assert mock_makedirs.call_args_list == [call("/tmp/bookworm", exist_ok=True)]
     assert mock_shutil.copy.call_args_list == [call(mock_glob.glob.return_value[0], "/tmp/bookworm/firefox.sqlite")]

@@ -152,6 +152,21 @@ poetry install
 bookworm --help
 ```
 
+<details>
+<summary>Running Linux tests on MacOS/Windows</summary>
+
+If you are running on a non-linux machine, it may be helpful to run the provided [Dockerfile](./Dockerfile.linux) to verify it's working on that environment.
+
+You can build this via:
+
+```bash
+make docker_linux
+```
+
+You will need to have Docker installed to run this.
+
+</details>
+
 ## Adding an Integration
 
 As you can see from [usage](#usage), bookworm supports various integrations but not all. If you find one that you want to support then a change is needed inside [integrations.py](./bookworm_genai/integrations.py).

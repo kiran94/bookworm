@@ -17,7 +17,9 @@ def store_documents(docs: list[Document]):
 
     embeddings = _get_embedding_store()
 
-    logger.info(f"vectorizing and storing {len(docs)} documents into {full_database_path}")
+    logger.info(f"vectorizing and storing {len(docs)} documents locally")
+    logger.debug(f'storing into {full_database_path}')
+
     with duckdb.connect(full_database_path) as conn:
         logger.debug(f"dropping existing embeddings table '{DEFAULT_TABLE_NAME}' if exists")
         conn.execute(f"DROP TABLE IF EXISTS {DEFAULT_TABLE_NAME}")

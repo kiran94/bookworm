@@ -2,6 +2,7 @@ from unittest.mock import call, patch, Mock
 
 import pytest
 
+from bookworm_genai.integrations import Browser
 from bookworm_genai.models import Bookmark
 
 
@@ -18,7 +19,7 @@ from bookworm_genai.models import Bookmark
 def test_bookmark_open(mock_platform: Mock, mock_subprocess: Mock, platform: str, expected_subprocess_call: call):
     mock_platform.platform = platform
 
-    bookmark = Bookmark(title="Google", url="https://www.google.com", source="Google")
+    bookmark = Bookmark(title="Google", url="https://www.google.com", source="Google", browser=Browser.CHROME.value)
     bookmark.open()
 
     assert mock_subprocess.Popen.call_args == expected_subprocess_call
@@ -30,7 +31,7 @@ def test_bookmark_open(mock_platform: Mock, mock_subprocess: Mock, platform: str
 def test_bookmark_unsupported_os(mock_platform: Mock, mock_subprocess: Mock, mock_logger: Mock):
     mock_platform.platform = "chromeos"
 
-    bookmark = Bookmark(title="Google", url="https://www.google.com", source="Google")
+    bookmark = Bookmark(title="Google", url="https://www.google.com", source="Google", browser=Browser.CHROME.value)
     bookmark.open()
 
     assert mock_logger.warning.call_args == call('Platform "chromeos" not supported. Printing URL instead')

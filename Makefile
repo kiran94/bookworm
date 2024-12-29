@@ -1,3 +1,5 @@
+OS := $(shell uname)
+
 test:
 	poetry run pytest -vv
 
@@ -15,5 +17,10 @@ coverage:
 	$(if $(GITHUB_ACTIONS),poetry run pytest -q --cov=bookworm_genai --cov-report=lcov,)
 
 check_database:
+ifeq ($(OS),Darwin)
+	duckdb "/Users/kiran/Library/Application Support/bookworm/bookmarks.duckdb" -c 'SELECT * FROM embeddings LIMIT 5; SELECT COUNT(*) FROM embeddings'
+else ifeq ($(OS),Linux)
 	duckdb ~/.local/share/bookworm/bookmarks.duckdb -c 'SELECT * FROM embeddings LIMIT 5; SELECT COUNT(*) FROM embeddings'
-
+else
+	@echo "OS not supported"
+endif

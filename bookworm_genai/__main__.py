@@ -27,7 +27,7 @@ def main():
     args = arg_parser.parse_args(sys.argv[1:])
 
     logger.info("[bold green]Starting Bookworm 📖")
-    logger.debug("Running on platform '%s'", sys.platform)
+    logger.debug("Running on platform '%s' with version '%s'", sys.platform, __version__)
 
     logger.debug("Arguments: %s", args)
 

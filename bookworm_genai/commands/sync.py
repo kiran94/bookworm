@@ -10,6 +10,7 @@ from langchain_core.documents import Document
 
 from bookworm_genai.integrations import Browser, browsers, BrowserManifest
 from bookworm_genai.storage import store_documents, _get_embedding_store
+from bookworm_genai.metadata import attach_metadata
 
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,12 @@ def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, brow
 
             loader = platform_config["bookmark_loader"](**config)
 
-            docs.extend(loader.lazy_load())
+            current_docs: list[Document] = list(loader.lazy_load())
+
+            for index, doc in enumerate(current_docs):
+                current_docs[index] = attach_metadata(current_docs[index], browser)
+
+            docs.extend(current_docs)
 
     logger.debug(f"{len(docs)} Bookmarks loaded")
 
@@ -56,8 +62,6 @@ def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, brow
 
     if docs:
         store_documents(docs)
-
-
 
 
 def _copy(config: dict):

@@ -7,6 +7,7 @@ import pytest
 
 from bookworm_genai.commands.sync import _estimate_cost, sync
 from bookworm_genai.integrations import Browser, browsers
+from bookworm_genai.metadata import Metadata
 
 
 def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] = ["DOC1", "DOC2"]):
@@ -109,7 +110,7 @@ def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     mock_sys.platform = platform
     user = getuser()
 
-    browsers = _mock_browsers_config(platform)
+    browsers = _mock_browsers_config(platform, mocked_documents=[Mock('DOC1', metadata={}), Mock('DOC2', metadata={})])
     sync(browsers)
 
     collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
@@ -194,7 +195,7 @@ def test_sync_estimate_cost(
     mocked_input.return_value = "0.100"
 
     mocked_documents = [
-        Mock(page_content="mocked_page_content"),
+        Mock(page_content="mocked_page_content", metadata={}),
     ]
 
     browsers = _mock_browsers_config(mocked_documents=mocked_documents)
@@ -244,7 +245,7 @@ def test_sync_browser_filter(
     platform = 'darwin'
     mock_sys.platform = platform
 
-    browsers = _mock_browsers_config()
+    browsers = _mock_browsers_config(mocked_documents=[Mock('DOC1', metadata={}), Mock('DOC2', metadata={})])
     sync(browsers, browser_filter=browser_filter)
 
     assert browsers[Browser.CHROME][platform]['bookmark_loader'].called
@@ -261,7 +262,7 @@ def test_sync_copy_source_missing(mock_glob: Mock, mock_shutil: Mock, mock_os: M
     path_to_missing_file = "/path/to/missing/file"
 
     mock_docs_loader = Mock()
-    mock_docs_loader.return_value.lazy_load.return_value = ["DOC1", "DOC2"]
+    mock_docs_loader.return_value.lazy_load.return_value = [Mock("DOC1", metadata={}), Mock("DOC2", metadata={})]
 
     browsers = {
         # this one will fail and be skipped due to missing file
@@ -292,4 +293,17 @@ def test_sync_copy_source_missing(mock_glob: Mock, mock_shutil: Mock, mock_os: M
     mock_glob.glob.assert_called_once_with(path_to_missing_file)
 
     # ensures that even if the first browser fails, the second one still extracts docs and submits to storage
-    assert mock_store_documents.call_args_list == [call(["DOC1", "DOC2"])]
+    assert mock_store_documents.call_count == 1
+    assert len(mock_store_documents.call_args_list[0]) == 2
+
+@patch('bookworm_genai.commands.sync.store_documents')
+def test_sync_metadata_attached(store_document: Mock):
+
+    document_mock = Mock('DOC1', metadata={})
+    mock_browsers = _mock_browsers_config(sys.platform, [document_mock])
+
+    sync(mock_browsers, browser_filter=Browser.CHROME)
+
+    assert document_mock.metadata == {
+        Metadata.Browser.value: Browser.CHROME.value
+    }

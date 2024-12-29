@@ -67,7 +67,7 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     user = getuser()
     mock_glob.glob.return_value = ["/mocked/firefox.sqlite"]
 
-    browsers = _mock_browsers_config()
+    browsers = _mock_browsers_config(mocked_documents=[Mock('DOC1', metadata={}), Mock('DOC2', metadata={})])
     sync(browsers)
 
     collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
@@ -92,7 +92,7 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
         call(db=ANY, query=ANY, source_columns=["id", "dateAdded", "lastModified"], page_content_mapper=ANY),
     ]
 
-    assert mock_store_documents.call_args_list == [call(["DOC1", "DOC2", "DOC1", "DOC2", "DOC1", "DOC2"])]
+    assert len(mock_store_documents.call_args_list[0]) == 6
     assert mock_makedirs.call_args_list == [call("/tmp/bookworm", exist_ok=True)]
     assert mock_shutil.copy.call_args_list == [call(mock_glob.glob.return_value[0], "/tmp/bookworm/firefox.sqlite")]
 

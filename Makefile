@@ -24,3 +24,8 @@ else ifeq ($(OS),Linux)
 else
 	@echo "OS not supported"
 endif
+
+# Useful if you are running on non-linux machine
+# and want to verify tests are still working on that platform
+test_linux:
+	docker build -f Dockerfile.linux -t bookworm .

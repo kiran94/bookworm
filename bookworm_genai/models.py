@@ -15,6 +15,7 @@ class Bookmark(BaseModel):
     title: str = Field(description="The title of the bookmark")
     url: str = Field(description="The URL of the bookmark")
     source: str = Field(description="The source of the bookmark")
+    browser: str = Field(description="The browser that the bookmark was saved from")
 
     def open(self):
         if sys.platform == "win32":

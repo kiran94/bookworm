@@ -169,7 +169,7 @@ You will need to have Docker installed to run this.
 
 ## Adding an Integration
 
-As you can see from [usage](#usage), bookworm supports various integrations but not all. If you find one that you want to support then a change is needed inside [integrations.py](./bookworm_genai/integrations.py).
+As you can see from [usage](#usage), bookworm supports various integrations but not all. If you find one that you want to support one, then a change is needed inside [integrations.py](./bookworm_genai/integrations.py).
 
 You can see in that file there is a variable called `browsers` that follows this structure:
 

@@ -5,9 +5,11 @@ from unittest.mock import patch, Mock, call, ANY
 
 import pytest
 
+from bookworm_genai import __version__
 from bookworm_genai.commands.sync import _estimate_cost, sync
 from bookworm_genai.integrations import Browser, browsers
 from bookworm_genai.metadata import Metadata
+from bookworm_genai.utils import sql_loader_firefox_sql_query
 
 
 def _mock_browsers_config(platform: str = "linux", mocked_documents: list[any] = ["DOC1", "DOC2"]):
@@ -89,7 +91,7 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
             jq_schema='\n  [.roots.bookmark_bar.children, .roots.other.children] |\n  flatten |\n  .. |\n  objects |\n  select(.type == "url")\n',
             text_content=False,
         ),
-        call(db=ANY, query=ANY, source_columns=["id", "dateAdded", "lastModified"], page_content_mapper=ANY),
+        call(db=ANY, query=sql_loader_firefox_sql_query(), source_columns=["source"], page_content_mapper=ANY),
     ]
 
     assert mock_store_documents.call_count == 1, "store_documents should be called once"
@@ -144,7 +146,7 @@ def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
             text_content=False,
         ),
         # firefox
-        call(db=ANY, query=ANY, source_columns=["id", "dateAdded", "lastModified"], page_content_mapper=ANY),
+        call(db=ANY, query=sql_loader_firefox_sql_query(), source_columns=['source'], page_content_mapper=ANY),
     ]
 
 
@@ -312,5 +314,6 @@ def test_sync_metadata_attached(store_document: Mock):
     sync(mock_browsers, browser_filter=Browser.CHROME)
 
     assert document_mock.metadata == {
-        Metadata.Browser.value: Browser.CHROME.value
+        Metadata.Browser.value: Browser.CHROME.value,
+        Metadata.BookwormVersion.value: __version__
     }

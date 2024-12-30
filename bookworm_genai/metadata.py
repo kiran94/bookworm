@@ -4,9 +4,10 @@ from langchain_core.documents import Document
 from bookworm_genai import __version__
 from bookworm_genai.integrations import Browser
 
+
 class Metadata(str, enum.Enum):
-    Browser = 'browser'
-    BookwormVersion = 'bookworm_version'
+    Browser = "browser"
+    BookwormVersion = "bookworm_version"
 
 
 def attach_metadata(doc: Document, browser: Browser) -> Document:

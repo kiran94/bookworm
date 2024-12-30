@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 
 def main():
     arg_parser = argparse.ArgumentParser(description="LLM-powered bookmark search engine")
-    arg_parser.add_argument('--version', action='version', version=__version__)
+    arg_parser.add_argument("--version", action="version", version=__version__)
 
     sub_parsers = arg_parser.add_subparsers(dest="command", help="Available commands", required=True)
 
     sync_parser = sub_parsers.add_parser("sync", help="Sync the bookmark database with the latest changes")
     sync_parser.add_argument("--estimate-cost", action="store_true", default=False, help="Estimate the cost of syncing the bookmark database")
-    sync_parser.add_argument("--browser-filter", default=[], help='Only sync a subset of browsers', choices=Browser.list())
+    sync_parser.add_argument("--browser-filter", default=[], help="Only sync a subset of browsers", choices=Browser.list())
 
     ask_parser = sub_parsers.add_parser("ask", help="Search for a bookmark")
     ask_parser.add_argument("-n", "--top-n", type=int, default=3, help="Number of bookmarks to return")
@@ -61,7 +61,9 @@ def main():
         for index, bookmark in enumerate(bookmarks.bookmarks):
             if logger.isEnabledFor(logging.DEBUG):
                 # also shows the source of the bookmark
-                logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ([green]{bookmark.source}[/])")  # pragma: no cover
+                logger.info(
+                    f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ([green]{bookmark.source}[/])"
+                )  # pragma: no cover
             else:
                 logger.info(f"[green][{index}] [/] {bookmark.title} - [link={bookmark.url}]{bookmark.url}[/link] ([green]{bookmark.browser}[/])")
 

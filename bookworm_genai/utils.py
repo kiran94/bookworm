@@ -44,6 +44,11 @@ def sql_loader_firefox_copy_path() -> str:
 
 @cache
 def sql_loader_firefox_sql_query() -> str:
+    '''
+    Generates the SQL query for the SQL Loader to extract the bookmarks from the Firefox database.
+    This query also embeds a literal column called 'source' which is the path to the database file. This is needed in the query so
+    that when the SQL Loader runs we can tell it to put this source into the metadata.
+    '''
     return f'''
         SELECT
             CAST(moz_places.id AS TEXT) AS id,

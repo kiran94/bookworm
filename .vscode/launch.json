@@ -1,0 +1,59 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Bookworm: Sync",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "bookworm_genai",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "LOGGING_LEVEL": "DEBUG"
+            },
+            "args": [
+                "sync",
+                // "--estimate-cost"
+            ],
+        },
+        {
+            "name": "Bookworm: Sync (Browser Filter)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "bookworm_genai",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "LOGGING_LEVEL": "DEBUG"
+            },
+            "args": [
+                "sync",
+                "--browser-filter", "${input:browser}"
+            ],
+        },
+        {
+            "name": "Bookworm: Ask",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "bookworm_genai",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "LOGGING_LEVEL": "DEBUG"
+            },
+            "args": [
+                "ask"
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "browser",
+            "type": "pickString",
+            "description": "Pick the browser you want to filter on:",
+            "options": [
+                "chrome",
+                "firefox",
+                "brave",
+            ],
+            "default": "chrome"
+        }
+    ]
+}

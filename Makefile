@@ -6,6 +6,9 @@ test:
 lint:
 	poetry run ruff check $(if $(GITHUB_ACTIONS),--output-format github,) .
 
+format:
+	poetry run ruff format
+
 coverage:
 	poetry run pytest -q --cov=bookworm_genai --cov-report=term # for local
 	poetry run pytest -q --cov=bookworm_genai --cov-report=html # for local

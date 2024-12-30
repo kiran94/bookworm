@@ -18,7 +18,7 @@ def store_documents(docs: list[Document]):
     embeddings = _get_embedding_store()
 
     logger.info(f"vectorizing and storing {len(docs)} documents locally")
-    logger.debug(f'storing into {full_database_path}')
+    logger.debug(f"storing into {full_database_path}")
 
     with duckdb.connect(full_database_path) as conn:
         logger.debug(f"dropping existing embeddings table '{DEFAULT_TABLE_NAME}' if exists")
@@ -46,4 +46,4 @@ def _get_embedding_store() -> Embeddings:
         return OpenAIEmbeddings()
 
     else:
-        raise ValueError('Embeddings service could not be configured. Ensure you have OPENAI_API_KEY set.')
+        raise ValueError("Embeddings service could not be configured. Ensure you have OPENAI_API_KEY set.")

@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "ms-toolsai.jupyter",
+        "yzhang.markdown-all-in-one",
+        "charliermarsh.ruff",
+        "hbenl.vscode-test-explorer",
+    ]
+}

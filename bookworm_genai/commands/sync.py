@@ -23,13 +23,13 @@ def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, brow
         browser: Browser = browser
 
         if browser_filter and (browser.value not in browser_filter):
-            logger.debug(f'browser {browser.value} skipped due to filter')
+            logger.debug(f"browser {browser.value} skipped due to filter")
             continue
 
         try:
             platform_config = config[sys.platform]
         except KeyError:
-            logger.warning(f'🔄 browser {browser.value} is not supported on {sys.platform} yet')
+            logger.warning(f"🔄 browser {browser.value} is not supported on {sys.platform} yet")
             continue
         else:
             if "copy" in platform_config:
@@ -82,7 +82,7 @@ def _copy(config: dict):
 
 
 def _log_bookmark_source(browser: Browser, platform_config: dict):
-    logger.info(f'✅ browser {browser.value} bookmarks loaded!')
+    logger.info(f"✅ browser {browser.value} bookmarks loaded!")
 
     path = ""
 
@@ -138,10 +138,11 @@ def _estimate_cost(docs: list[Document], cost_per_million: Optional[float] = Non
 
 
 class BrowserBookmarkFileNotFound(Exception):
-    '''
+    """
     Represents that a bookmark file on the local file system could not be found.
     For example if a configuration is defined with a glob expression /my/path/*.sqlite but that path resolves to nothing.
-    '''
+    """
+
     def __init__(self, file: str):
         self.file = file
         super().__init__(f"Could not resolve file: {file}")

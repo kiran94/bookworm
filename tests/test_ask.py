@@ -156,7 +156,6 @@ def test_bookmark_chain_is_valid_invalid_response(
         assert not bc.is_valid()
 
 
-
 @patch.dict(os.environ, {}, clear=True)
 def test_get_llm_no_env():
     with pytest.raises(ValueError, match="LLM service could not be configured"):

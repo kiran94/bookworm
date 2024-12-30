@@ -8,6 +8,7 @@ from langchain_community.utilities.sql_database import SQLDatabase
 
 from bookworm_genai.utils import CHROMIUM_JQ_COMMAND, sql_loader_page_content_mapper, sql_loader_firefox_copy_path, sql_loader_firefox_sql_query
 
+
 class Browser(str, Enum):
     BRAVE = "brave"
     CHROME = "chrome"
@@ -16,6 +17,7 @@ class Browser(str, Enum):
     @classmethod
     def list(cls):
         return list(map(lambda c: c.value, cls))
+
 
 BrowserManifest = dict[Browser, dict[str, dict[str, Any]]]
 

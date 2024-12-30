@@ -141,6 +141,7 @@ Recommendations:
 
 - Install [`pyenv`](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation) and ensure [build dependencies are installed](https://github.com/pyenv/pyenv?tab=readme-ov-file#install-python-build-dependencies) for your OS.
 - Install [Poetry](https://python-poetry.org/docs/) we will be using [environment management](https://python-poetry.org/docs/managing-environments/) below.
+- VS Code Extensions recommendations can be found [here](./.vscode/extensions.json) and will be suggested upon first opening the project.
 
 
 ```bash

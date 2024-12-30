@@ -83,4 +83,6 @@ def _get_llm() -> BaseChatModel:
         return ChatOpenAI(**kwargs)
 
     else:
-        raise ValueError('LLM service could not be configured. Ensure you have OPENAI_API_KEY. If you are using OpenAI then please ensure you have the OPENAI_API_KEY environment variable set.')
+        raise ValueError(
+            "LLM service could not be configured. Ensure you have OPENAI_API_KEY. If you are using OpenAI then please ensure you have the OPENAI_API_KEY environment variable set."
+        )

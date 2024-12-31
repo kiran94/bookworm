@@ -56,9 +56,7 @@ The `sync` process currently supports the following configurations:
 
 *`bookworm sync`*
 
-```python
-python -m bookworm sync
-```
+Vectorize your bookmarks across all supported browsers.
 
 ```mermaid
 graph LR
@@ -99,9 +97,7 @@ print(PlatformDirs('bookworm').user_data_dir)
 
 *`bookworm ask`*
 
-```python
-python -m bookworm ask
-```
+Search from your bookmarks
 
 ```mermaid
 graph LR
@@ -116,11 +112,26 @@ end
 
 query -->|user queries for information|Bookworm
 
-Bookworm -->|simularity search|VectorStore -->|send similar docs + user query|LLM
+Bookworm -->|similarity search|VectorStore -->|send similar docs + user query|LLM
 LLM -->|send back response|Bookworm
 ```
 
 ---
+
+*`bookworm export`*
+
+Export your bookmarks across all supported browsers into an output (e.g CSV)
+
+```mermaid
+graph LR
+
+VectorStore
+Bookworm(bookworm export)
+CSV(bookmarks.csv)
+
+VectorStore -->|extract all bookmarks|Bookworm
+Bookworm -->|export into file|CSV
+```
 
 ## Developer Setup
 

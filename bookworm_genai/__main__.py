@@ -6,6 +6,7 @@ from bookworm_genai import __version__
 from bookworm_genai.integrations import browsers, Browser
 from bookworm_genai.commands.sync import sync
 from bookworm_genai.commands.ask import BookmarkChain
+from bookworm_genai.commands.export import export
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,10 @@ def main():
     ask_parser = sub_parsers.add_parser("ask", help="Search for a bookmark")
     ask_parser.add_argument("-n", "--top-n", type=int, default=3, help="Number of bookmarks to return")
     ask_parser.add_argument("-q", "--query", help="The Search Query")
+
+    export_parser = sub_parsers.add_parser("export", help="Export bookmarks")
+    export_parser.add_argument("--format", choices=["csv"], default="csv")
+    export_parser.add_argument("--output", default="bookmarks.csv")
 
     args = arg_parser.parse_args(sys.argv[1:])
 
@@ -79,6 +84,12 @@ def main():
                 logger.warning(f"Invalid input: '{raw_input}'. Please enter a number.")
             except IndexError:
                 logger.warning(f"Invalid index: '{selected_index}'. Please select a valid index.")
+
+    elif args.command == "export":
+        bookmarks = export()
+
+        logger.info(f"[blue]Exporting bookmarks to '{args.output}' [/]")
+        bookmarks.to_csv(args.output, index=False)
 
 
 if __name__ == "__main__":

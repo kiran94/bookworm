@@ -131,3 +131,23 @@ def test_main_ask_invalid_input(mock_sys: Mock, mock_bookmark_chain: Mock, mock_
     main()
 
     assert bc.ask.return_value.bookmarks[1].open.called
+
+
+@pytest.mark.parametrize(
+    "arguments, expected_call",
+    [
+        pytest.param([], [call("bookmarks.csv", index=False)], id="no_output_override"),
+        pytest.param(["--output", "hello.csv"], [call("hello.csv", index=False)], id="output_override"),
+    ],
+)
+@patch("bookworm_genai.__main__.export")
+@patch("bookworm_genai.__main__.sys")
+def test_main_export(mock_sys: Mock, mock_export: Mock, arguments: list[str], expected_call):
+    mock_sys.argv = ["script", "export", *arguments]
+
+    mock_bookmarks = Mock()
+    mock_export.return_value = mock_bookmarks
+
+    main()
+
+    assert mock_bookmarks.to_csv.call_args_list == expected_call

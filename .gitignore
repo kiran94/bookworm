@@ -178,4 +178,5 @@ pyrightconfig.json
 .duckdb
 .json
 .sqlite
-.csv
+*.csv
+

@@ -6,7 +6,9 @@
 
 `bookworm` allows you to search from your local browser bookmarks using natural language. For times when you have a large collection of bookmarks and you can't quite remember where you put that one website you need at the moment.
 
-[![asciicast](https://asciinema.org/a/696613.svg)](https://asciinema.org/a/696613)
+[![asciicast](https://asciinema.org/a/696722.svg)](https://asciinema.org/a/696722)
+
+*In the example above, we search for the term “Japan.” While some results don’t explicitly mention the word, terms like “Osaka” appear because they are closely related to the search term based on OpenAI embeddings.*
 
 ## Install
 

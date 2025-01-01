@@ -18,7 +18,7 @@ jobs:
         # https://devguide.python.org/versions/
         python-version: ['3.9', '3.10', '3.11', '3.12']
         poetry-version: ['1.4.2']
-        os: [ubuntu-latest] # , windows-latest]
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4

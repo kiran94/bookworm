@@ -69,7 +69,7 @@ def test_sync_linux(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     user = getuser()
     mock_glob.glob.return_value = ["/mocked/firefox.sqlite"]
 
-    browsers = _mock_browsers_config(mocked_documents=[Mock("DOC1", metadata={}), Mock("DOC2", metadata={})])
+    browsers = _mock_browsers_config(mocked_documents=[Mock("DOC1", metadata={}, page_content=""), Mock("DOC2", metadata={}, page_content="")])
     sync(browsers)
 
     collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
@@ -119,7 +119,7 @@ def test_sync_macos(mock_sys: Mock, mock_store_documents: Mock, mock_makedirs: M
     mock_sys.platform = platform
     user = getuser()
 
-    browsers = _mock_browsers_config(platform, mocked_documents=[Mock("DOC1", metadata={}), Mock("DOC2", metadata={})])
+    browsers = _mock_browsers_config(platform, mocked_documents=[Mock("DOC1", metadata={}, page_content=""), Mock("DOC2", metadata={}, page_content="")])
     sync(browsers)
 
     collected_file_paths, collected_loader_calls = _collect_browser_calls(platform, browsers)
@@ -249,7 +249,7 @@ def test_sync_browser_filter(mock_sys: Mock, mock_store_documents: Mock, mock_ma
     platform = "darwin"
     mock_sys.platform = platform
 
-    browsers = _mock_browsers_config(mocked_documents=[Mock("DOC1", metadata={}), Mock("DOC2", metadata={})])
+    browsers = _mock_browsers_config(mocked_documents=[Mock("DOC1", metadata={}, page_content=""), Mock("DOC2", metadata={}, page_content="")])
     sync(browsers, browser_filter=browser_filter)
 
     assert browsers[Browser.CHROME][platform]["bookmark_loader"].called
@@ -264,7 +264,7 @@ def test_sync_copy_source_missing(mock_glob: Mock, mock_shutil: Mock, mock_os: M
     path_to_missing_file = "/path/to/missing/file"
 
     mock_docs_loader = Mock()
-    mock_docs_loader.return_value.lazy_load.return_value = [Mock("DOC1", metadata={}), Mock("DOC2", metadata={})]
+    mock_docs_loader.return_value.lazy_load.return_value = [Mock("DOC1", metadata={}, page_content=""), Mock("DOC2", metadata={}, page_content="")]
 
     browsers = {
         # this one will fail and be skipped due to missing file
@@ -301,7 +301,7 @@ def test_sync_copy_source_missing(mock_glob: Mock, mock_shutil: Mock, mock_os: M
 
 @patch("bookworm_genai.commands.sync.store_documents")
 def test_sync_metadata_attached(store_document: Mock):
-    document_mock = Mock("DOC1", metadata={})
+    document_mock = Mock("DOC1", metadata={}, page_content="")
     mock_browsers = _mock_browsers_config(sys.platform, [document_mock])
 
     sync(mock_browsers, browser_filter=Browser.CHROME)

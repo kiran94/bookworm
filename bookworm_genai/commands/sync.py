@@ -51,6 +51,7 @@ def sync(browsers: BrowserManifest = browsers, estimate_cost: bool = False, brow
             current_docs: list[Document] = list(loader.lazy_load())
 
             for index, doc in enumerate(current_docs):
+                logger.debug(doc.page_content)
                 current_docs[index] = attach_metadata(current_docs[index], browser)
 
             docs.extend(current_docs)

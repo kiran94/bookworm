@@ -11,9 +11,8 @@
                 "LOGGING_LEVEL": "DEBUG"
             },
             "args": [
-                "sync",
-                // "--estimate-cost"
-            ],
+                "sync"
+            ]
         },
         {
             "name": "Bookworm: Sync (Browser Filter)",
@@ -27,7 +26,7 @@
             "args": [
                 "sync",
                 "--browser-filter", "${input:browser}"
-            ],
+            ]
         },
         {
             "name": "Bookworm: Ask",
@@ -51,7 +50,7 @@
             "options": [
                 "chrome",
                 "firefox",
-                "brave",
+                "brave"
             ],
             "default": "chrome"
         }

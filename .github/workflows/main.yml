@@ -38,10 +38,10 @@ jobs:
       - name: Test
         run: make test
       - name: Code Coverage
-        if: matrix.python-version == '3.x' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
+        if: matrix.python-version == '3.12' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
         run: make coverage
       - name: Code Coverage Report
-        if: matrix.python-version == '3.x' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
+        if: matrix.python-version == '3.12' && matrix.poetry-version == '1.4.2' && matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/main'
         uses: romeovs/lcov-reporter-action@2a28ec3e25fb7eae9cb537e9141603486f810d1a # https://github.com/romeovs/lcov-reporter-action/issues/46
         with:
           lcov-file: coverage.lcov

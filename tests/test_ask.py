@@ -48,7 +48,7 @@ def test_bookmark_chain_ask(
     mock_duckdb_vector.return_value.as_retriever.assert_called_once_with(search_kwargs={"k": 3})
     assert mock_duckdb_connection.close.called
 
-    mock_chatopenai.assert_called_once_with(temperature=0.0)
+    mock_chatopenai.assert_called_once_with(temperature=0.0, model="gpt-4o")
     mock_llm.with_structured_output.assert_called_once_with(Bookmarks)
     mock_chat_prompt_template.from_messages.assert_called_once_with([("system", _system_message), ("human", "{query}")])
 

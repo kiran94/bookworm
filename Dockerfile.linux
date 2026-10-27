@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-RUN python3 -m pip install poetry==1.4.2
+RUN python3 -m pip install uv==0.12.14
 
 RUN useradd -m -s /bin/bash my_user \
     && echo "my_user:password" | chpasswd \
@@ -12,5 +12,5 @@ RUN chown -R my_user:my_user /home/my_user/app
 
 USER my_user
 
-RUN poetry install
-RUN poetry run pytest -v
+RUN uv sync --locked
+RUN uv run --locked pytest -v

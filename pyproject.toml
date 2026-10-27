@@ -1,45 +1,67 @@
-[tool.poetry]
+[project]
 name = "bookworm_genai"
-version = "0.13.0"
+version = "0.14.0"
 description = "Bookworm - A LLM-powered bookmark search engine"
-authors = ["kiran94"]
+authors = [{ name = "kiran94" }]
+requires-python = ">=3.9,<4"
 readme = "README.md"
 license = "MIT"
-homepage = "https://pypi.org/project/bookworm_genai/"
-repository = "https://github.com/kiran94/bookworm"
-documentation = "https://github.com/kiran94/bookworm/blob/main/README.md"
-keywords = [ "bookmarks", "bookmark-manager", "genai", "chatbots" ]
+keywords = [
+    "bookmarks",
+    "bookmark-manager",
+    "genai",
+    "chatbots",
+]
 classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Topic :: Utilities",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "langchain>=0.2.12,<0.3",
+    "langchain-community>=0.2.11,<0.3",
+    "langchain-openai>=0.1.20,<0.2",
+    "jq>=1.7.0,<2",
+    "duckdb>=1.0.0,<2",
+    "rich>=13.7.1,<14",
+    "platformdirs>=4.2.2,<5",
+    "pandas>=2.2.2,<3",
+    "tiktoken>=0.7.0,<0.8",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-langchain = "^0.2.12"
-langchain-community = "^0.2.11"
-langchain-openai = "^0.1.20"
-jq = "^1.7.0"
-duckdb = "^1.0.0"
-rich = "^13.7.1"
-platformdirs = "^4.2.2"
-pandas = "^2.2.2"
-tiktoken = "^0.7.0"
+[project.urls]
+Homepage = "https://pypi.org/project/bookworm_genai/"
+Repository = "https://github.com/kiran94/bookworm"
+Documentation = "https://github.com/kiran94/bookworm/blob/main/README.md"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.2"
-ruff = "^0.5.6"
-pytest-cov = "^5.0.0"
-pytest-github-actions-annotate-failures = "^0.2.0"
-litecli = "^1.11.0"
+[project.scripts]
+bookworm = "bookworm_genai.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.2,<9",
+    "ruff>=0.5.6,<0.6",
+    "pytest-cov>=5.0.0,<6",
+    "pytest-github-actions-annotate-failures>=0.2.0,<0.3",
+    "litecli>=1.11.0,<2",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.build-backend]
+module-root = ""
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-bookworm = 'bookworm_genai.__main__:main'
+requires = ["uv_build>=0.12.14,<0.13.0"]
+build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 160

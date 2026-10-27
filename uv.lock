@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.9, <4"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -152,8 +152,9 @@ wheels = [
 
 [[package]]
 name = "bookworm-genai"
-version = "0.14.0"
+version = "0.14.1"
 source = { editable = "." }
+default-groups = "all"
 dependencies = [
     { name = "duckdb" },
     { name = "jq" },

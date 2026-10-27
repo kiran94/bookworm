@@ -1,23 +1,23 @@
 OS := $(shell uname)
 
 test:
-	poetry run pytest -vv
+	uv run pytest -vv
 
 lint:
-	poetry run ruff check $(if $(GITHUB_ACTIONS),--output-format github,) .
+	uv run ruff check $(if $(GITHUB_ACTIONS),--output-format github,) .
 
 format:
-	poetry run ruff format
+	uv run ruff format
 
 coverage:
-	poetry run pytest -q --cov=bookworm_genai --cov-report=term # for local
-	poetry run pytest -q --cov=bookworm_genai --cov-report=html # for local
+	uv run pytest -q --cov=bookworm_genai --cov-report=term # for local
+	uv run pytest -q --cov=bookworm_genai --cov-report=html # for local
 
 	# for sonarqube
-	$(if $(GITHUB_ACTIONS),poetry run pytest -q --cov=bookworm_genai --cov-report=xml,)
+	$(if $(GITHUB_ACTIONS),uv run pytest -q --cov=bookworm_genai --cov-report=xml,)
 
 	# for github action
-	$(if $(GITHUB_ACTIONS),poetry run pytest -q --cov=bookworm_genai --cov-report=lcov,)
+	$(if $(GITHUB_ACTIONS),puv run pytest -q --cov=bookworm_genai --cov-report=lcov,)
 
 check_database:
 ifeq ($(OS),Darwin)

@@ -33,7 +33,7 @@ class BookmarkChain:
         self.vector_store = DuckDBVectorStore(connection=self._duckdb_connection, embedding=_get_embedding_store())
 
         llm = _get_llm()
-        llm = llm.with_structured_output(Bookmarks)
+        llm = llm.with_structured_output(Bookmarks, method="json_schema")
 
         prompt = ChatPromptTemplate.from_messages([("system", _system_message), ("human", "{query}")])
 
@@ -74,7 +74,6 @@ class BookmarkChain:
 
 
 def _get_llm() -> BaseChatModel:
-
     kwargs = {
         "model": os.environ.get("BOOKWORM_LLM_MODEL", "gpt-4o"),
         "temperature": 0.0,

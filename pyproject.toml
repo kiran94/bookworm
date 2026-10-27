@@ -31,7 +31,7 @@ dependencies = [
     "rich>=13.7.1,<14",
     "platformdirs>=4.2.2,<5",
     "pandas>=2.2.2,<3",
-    "tiktoken>=0.7.0,<0.8",
+    "tiktoken>=0.8.0,<0.15",
 ]
 
 [project.urls]

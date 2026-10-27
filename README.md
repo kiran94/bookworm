@@ -159,7 +159,7 @@ Recommendations:
 
 
 ```bash
-uv venv --python 3.9
+uv venv --python 3.11
 
 uv run bookworm --help
 ```

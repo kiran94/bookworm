@@ -181,7 +181,7 @@ wheels = [
 
 [[package]]
 name = "bookworm-genai"
-version = "0.14.1"
+version = "0.15.0"
 source = { editable = "." }
 dependencies = [
     { name = "duckdb" },

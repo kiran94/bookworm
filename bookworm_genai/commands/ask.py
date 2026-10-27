@@ -74,14 +74,12 @@ class BookmarkChain:
 
 
 def _get_llm() -> BaseChatModel:
-    kwargs = {
-        "model": os.environ.get("BOOKWORM_LLM_MODEL", "gpt-4o"),
-        "temperature": 0.0,
-    }
+    model = os.environ.get("BOOKWORM_LLM_MODEL", "gpt-6-luna")
 
     if os.environ.get("OPENAI_API_KEY"):
         # https://reference.langchain.com/python/langchain-openai/chat_models/base/ChatOpenAI
-        return ChatOpenAI(**kwargs)
+        logger.debug(f"Using OpenAI model: {model}")
+        return ChatOpenAI(model=model)
 
     else:
         raise ValueError(

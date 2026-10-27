@@ -142,6 +142,7 @@ Bookworm -->|export into file|CSV
 ```bash
 # LLMs
 export OPENAI_API_KEY=
+export BOOKWORM_LLM_MODEL=gpt-6-luna
 
 # Langchain (optional, but useful for debugging)
 export LANGCHAIN_API_KEY=

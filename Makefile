@@ -17,7 +17,7 @@ coverage:
 	$(if $(GITHUB_ACTIONS),uv run pytest -q --cov=bookworm_genai --cov-report=xml,)
 
 	# for github action
-	$(if $(GITHUB_ACTIONS),puv run pytest -q --cov=bookworm_genai --cov-report=lcov,)
+	$(if $(GITHUB_ACTIONS),uv run pytest -q --cov=bookworm_genai --cov-report=lcov,)
 
 check_database:
 ifeq ($(OS),Darwin)

@@ -77,6 +77,8 @@ def test_bookmark_chain_ask_n_parameter(
     mock_duckdb_vector.return_value.as_retriever.assert_called_once_with(search_kwargs={"k": n})
 
 
+@patch("bookworm_genai.commands.ask.get_last_embedding_model", Mock(return_value="text-embedding-ada-002"))
+@patch("bookworm_genai.commands.ask._get_embedding_model_name", Mock(return_value="text-embedding-ada-002"))
 @patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
 @patch("bookworm_genai.commands.ask.ChatPromptTemplate")
 @patch("bookworm_genai.commands.ask.ChatOpenAI")
@@ -103,6 +105,8 @@ def test_bookmark_chain_is_valid(
     mock_duckdb_connection.execute.assert_called_once_with("SELECT COUNT(*) FROM embeddings")
 
 
+@patch("bookworm_genai.commands.ask.get_last_embedding_model", Mock(return_value="text-embedding-ada-002"))
+@patch("bookworm_genai.commands.ask._get_embedding_model_name", Mock(return_value="text-embedding-ada-002"))
 @patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
 @patch("bookworm_genai.commands.ask.ChatPromptTemplate")
 @patch("bookworm_genai.commands.ask.ChatOpenAI")
@@ -127,6 +131,8 @@ def test_bookmark_chain_is_valid_zero_count(
         assert not bc.is_valid()
 
 
+@patch("bookworm_genai.commands.ask.get_last_embedding_model", Mock(return_value="text-embedding-ada-002"))
+@patch("bookworm_genai.commands.ask._get_embedding_model_name", Mock(return_value="text-embedding-ada-002"))
 @patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
 @patch("bookworm_genai.commands.ask.ChatPromptTemplate")
 @patch("bookworm_genai.commands.ask.ChatOpenAI")
@@ -160,3 +166,61 @@ def test_bookmark_chain_is_valid_invalid_response(
 def test_get_llm_no_env():
     with pytest.raises(ValueError, match="LLM service could not be configured"):
         _get_llm()
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("bookworm_genai.commands.ask.ChatPromptTemplate")
+@patch("bookworm_genai.commands.ask.ChatOpenAI")
+@patch("bookworm_genai.commands.ask.DuckDBVectorStore")
+@patch("bookworm_genai.commands.ask.duckdb")
+@patch("bookworm_genai.commands.ask._get_embedding_store")
+@patch("bookworm_genai.commands.ask._get_local_store")
+@patch("bookworm_genai.commands.ask.get_last_embedding_model")
+def test_bookmark_chain_is_valid_no_embedding_model_record(
+    mock_get_last_embedding_model: Mock,
+    mock_local_store: Mock,
+    mock_embedding_store: Mock,
+    mock_duckdb: Mock,
+    mock_duckdb_vector: Mock,
+    mock_chatopenai: Mock,
+    mock_chat_prompt_template: Mock,
+):
+    mock_duckdb_connection = Mock()
+    mock_duckdb.connect.return_value = mock_duckdb_connection
+
+    mock_get_last_embedding_model.return_value = None
+
+    with BookmarkChain() as bc:
+        assert not bc.is_valid()
+
+    mock_get_last_embedding_model.assert_called_once_with(mock_duckdb_connection)
+    assert not mock_duckdb_connection.execute.called
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("bookworm_genai.commands.ask.ChatPromptTemplate")
+@patch("bookworm_genai.commands.ask.ChatOpenAI")
+@patch("bookworm_genai.commands.ask.DuckDBVectorStore")
+@patch("bookworm_genai.commands.ask.duckdb")
+@patch("bookworm_genai.commands.ask._get_embedding_store")
+@patch("bookworm_genai.commands.ask._get_local_store")
+@patch("bookworm_genai.commands.ask.get_last_embedding_model")
+def test_bookmark_chain_is_valid_embedding_model_changed(
+    mock_get_last_embedding_model: Mock,
+    mock_local_store: Mock,
+    mock_embedding_store: Mock,
+    mock_duckdb: Mock,
+    mock_duckdb_vector: Mock,
+    mock_chatopenai: Mock,
+    mock_chat_prompt_template: Mock,
+):
+    mock_duckdb_connection = Mock()
+    mock_duckdb.connect.return_value = mock_duckdb_connection
+
+    mock_get_last_embedding_model.return_value = "text-embedding-ada-002"
+    mock_embedding_store.return_value.model = "text-embedding-3-small"
+
+    with BookmarkChain() as bc:
+        assert not bc.is_valid()
+
+    assert not mock_duckdb_connection.execute.called

@@ -9,7 +9,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.language_models.chat_models import BaseChatModel
 
 from bookworm_genai.models import Bookmarks
-from bookworm_genai.storage import _get_local_store, _get_embedding_store
+from bookworm_genai.storage import _get_local_store, _get_embedding_store, _get_embedding_model_name, get_last_embedding_model
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,8 @@ class BookmarkChain:
         full_database_path = _get_local_store()
         logger.debug("Connecting to vector database at: %s", full_database_path)
         self._duckdb_connection = duckdb.connect(full_database_path, read_only=False)
-        self.vector_store = DuckDBVectorStore(connection=self._duckdb_connection, embedding=_get_embedding_store())
+        self._embeddings = _get_embedding_store()
+        self.vector_store = DuckDBVectorStore(connection=self._duckdb_connection, embedding=self._embeddings)
 
         llm = _get_llm()
         llm = llm.with_structured_output(Bookmarks, method="json_schema")
@@ -47,6 +48,18 @@ class BookmarkChain:
         return self.chain.invoke(query)
 
     def is_valid(self) -> bool:
+        last_model = get_last_embedding_model(self._duckdb_connection)
+        if last_model is None:
+            logger.warning("No record of the embedding model used was found in the database. Please run 'bookworm sync' before asking questions")
+            return False
+
+        current_model = _get_embedding_model_name(self._embeddings)
+        if last_model != current_model:
+            logger.warning(
+                f"The embedding model has changed from '{last_model}' to '{current_model}' since the last sync. Please run 'bookworm sync' before asking questions"
+            )
+            return False
+
         res = self._duckdb_connection.execute("SELECT COUNT(*) FROM embeddings").fetchall()
 
         try:

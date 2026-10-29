@@ -2,6 +2,7 @@ import os
 from unittest.mock import patch, Mock
 
 import pytest
+from langchain_openai.embeddings import OpenAIEmbeddings
 
 from bookworm_genai.commands.ask import BookmarkChain, _system_message, _get_llm
 from bookworm_genai.models import Bookmarks
@@ -218,7 +219,7 @@ def test_bookmark_chain_is_valid_embedding_model_changed(
     mock_duckdb.connect.return_value = mock_duckdb_connection
 
     mock_get_last_embedding_model.return_value = "text-embedding-ada-002"
-    mock_embedding_store.return_value.model = "text-embedding-3-small"
+    mock_embedding_store.return_value = Mock(spec=OpenAIEmbeddings, model="text-embedding-3-small")
 
     with BookmarkChain() as bc:
         assert not bc.is_valid()

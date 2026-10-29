@@ -57,8 +57,12 @@ def get_last_embedding_model(conn: duckdb.DuckDBPyConnection) -> Optional[str]:
 
 def _get_embedding_model_name(embeddings: Embeddings) -> str:
     # NOTE: .model is not part of the Embeddings contract (see also sync._estimate_cost)
-    # if we add more embeddings options in the future, we need to re-evaluate this.
-    return embeddings.model
+    # so it is only read from types known to expose it. If we add more embeddings options
+    # in the future, they will raise here until a suitable property is handled for them.
+    if isinstance(embeddings, OpenAIEmbeddings):
+        return embeddings.model
+    else:
+        raise TypeError(f"cannot get model name from {type(embeddings)}")
 
 
 def _get_local_store() -> str:

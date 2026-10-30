@@ -6,7 +6,7 @@ import pytest
 from langchain_core.embeddings import FakeEmbeddings
 from langchain_openai.embeddings import OpenAIEmbeddings
 
-from bookworm_genai.storage import store_documents, get_last_embedding_model, _get_embedding_model_name
+from bookworm_genai.storage import store_documents, get_last_embedding_model, _get_embedding_model_name, _get_embedding_store
 
 
 @patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
@@ -111,3 +111,17 @@ def test_get_embedding_model_name():
 def test_get_embedding_model_name_unsupported_embeddings():
     with pytest.raises(TypeError, match="cannot get model name from <class 'langchain_core.embeddings.fake.FakeEmbeddings'>"):
         _get_embedding_model_name(FakeEmbeddings(size=8))
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret"}, clear=True)
+@patch("bookworm_genai.storage.OpenAIEmbeddings")
+def test_embedding_store_default_model(mock_openai_embeddings: Mock):
+    assert _get_embedding_store() == mock_openai_embeddings.return_value
+    mock_openai_embeddings.assert_called_once_with(model="text-embedding-3-small")
+
+
+@patch.dict(os.environ, {"OPENAI_API_KEY": "secret", "BOOKWORM_EMBEDDING_MODEL": "text-embedding-3-large"}, clear=True)
+@patch("bookworm_genai.storage.OpenAIEmbeddings")
+def test_embedding_store_model_override(mock_openai_embeddings: Mock):
+    _get_embedding_store()
+    mock_openai_embeddings.assert_called_once_with(model="text-embedding-3-large")

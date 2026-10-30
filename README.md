@@ -143,6 +143,7 @@ Bookworm -->|export into file|CSV
 # LLMs
 export OPENAI_API_KEY=
 export BOOKWORM_LLM_MODEL=gpt-6-luna
+export BOOKWORM_EMBEDDING_MODEL=text-embedding-3-small
 
 # Langchain (optional, but useful for debugging)
 export LANGCHAIN_API_KEY=

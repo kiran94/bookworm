@@ -77,10 +77,12 @@ def _get_local_store() -> str:
 
 
 def _get_embedding_store() -> Embeddings:
+    model = os.environ.get("BOOKWORM_EMBEDDING_MODEL", "text-embedding-3-small")
+
     if os.environ.get("OPENAI_API_KEY", None):
-        logger.debug("Using OpenAI Embeddings")
-        # https://api.python.langchain.com/en/latest/embeddings/langchain_openai.embeddings.base.OpenAIEmbeddings.html
-        return OpenAIEmbeddings()
+        logger.debug(f"Using OpenAI Embeddings model: {model}")
+        # https://reference.langchain.com/python/langchain-openai/embeddings/base/OpenAIEmbeddings
+        return OpenAIEmbeddings(model=model)
 
     else:
         raise ValueError("Embeddings service could not be configured. Ensure you have OPENAI_API_KEY set.")

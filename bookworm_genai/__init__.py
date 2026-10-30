@@ -16,4 +16,4 @@ logging.basicConfig(
     handlers=[RichHandler(markup=True, show_path=_is_debug, show_time=_is_debug, show_level=_is_debug)],
 )
 
-logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpx2").setLevel(logging.WARNING)

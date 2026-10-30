@@ -12,6 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    try:
+        _main()
+    except KeyboardInterrupt:
+        logger.debug("halting due to keyboard interrupt", exc_info=True)
+
+
+def _main():
     arg_parser = argparse.ArgumentParser(description="LLM-powered bookmark search engine")
     arg_parser.add_argument("--version", action="version", version=__version__)
 

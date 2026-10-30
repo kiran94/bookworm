@@ -151,3 +151,11 @@ def test_main_export(mock_sys: Mock, mock_export: Mock, arguments: list[str], ex
     main()
 
     assert mock_bookmarks.to_csv.call_args_list == expected_call
+
+
+@patch("bookworm_genai.__main__._main")
+def test_main_keyboard_interrupt_handled(mock_main: Mock):
+    mock_main.side_effect = KeyboardInterrupt()
+
+    # the keyboard interrupt should not be propagated
+    main()

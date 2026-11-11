@@ -159,3 +159,27 @@ def test_main_keyboard_interrupt_handled(mock_main: Mock):
 
     # the keyboard interrupt should not be propagated
     main()
+
+
+@patch("builtins.input")
+@patch("bookworm_genai.__main__.BookmarkChain")
+@patch("bookworm_genai.__main__.sys")
+def test_main_ask_negative_index_rejected(mock_sys: Mock, mock_bookmark_chain: Mock, mock_input: Mock):
+    # A negative index must be rejected like an out-of-range one: Python
+    # would otherwise silently resolve bookmarks[-1] to the last entry
+    # and open the wrong bookmark.
+    mock_sys.argv = ["script", "ask"]
+    mock_input.side_effect = ["pandas column", "-1", "0"]
+
+    bc = Mock()
+    mock_bookmark_chain.return_value.__enter__.return_value = bc
+
+    bc.is_valid.return_value = True
+    first = Mock(title="first", url="http://google.com", source="/file/hello.txt")
+    second = Mock(title="second", url="http://google.com", source="/file/hello.txt")
+    bc.ask.return_value = Mock(bookmarks=[first, second])
+
+    main()
+
+    assert not second.open.called
+    assert first.open.called

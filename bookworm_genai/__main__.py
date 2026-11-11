@@ -84,6 +84,8 @@ def _main():
             try:
                 raw_input = input("> ")
                 selected_index = int(raw_input)
+                if not 0 <= selected_index < len(bookmarks.bookmarks):
+                    raise IndexError(selected_index)
                 bookmarks.bookmarks[selected_index].open()
 
                 break
